@@ -3,1483 +3,1201 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Free GMB Audit — Score Your Google Business Profile in 60 Seconds | Purple Crib Studios</title>
-<meta name="description" content="Get a free AI-powered Google Business Profile audit in 60 seconds. See your score out of 100, discover your biggest ranking gaps, and download a PDF action plan. No account needed."/>
-<meta name="keywords" content="free GMB audit, Google Business Profile audit, GMB score checker, local SEO audit free, Google Maps ranking checker"/>
+<title>Free GMB Audit — Real Data from Google | Purple Crib Studios</title>
+<meta name="description" content="Get a real AI-powered Google Business Profile audit. Connect your Google account and get scored on real data — not guesses. Free, instant, accurate."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<!-- Google Identity Services library -->
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root {
-  --ink: #0a0a0a;
-  --ink2: #1a1a1a;
-  --ink3: #2a2a2a;
-  --stone: #5a5a5a;
-  --dust: #9a9a9a;
-  --ash: #d4d4d4;
-  --cloud: #f0f0ed;
-  --paper: #fafaf8;
-  --white: #ffffff;
-  --lime: #8987b9;
-  --lime-dark: #8fb800;
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --sans: 'Instrument Sans', system-ui, sans-serif;
+  --bg: #0c0d10;
+  --surface: #13151a;
+  --surface2: #1a1d25;
+  --border: #242830;
+  --green: #00e676;
+  --green-dim: rgba(0,230,118,0.12);
+  --green-mid: rgba(0,230,118,0.3);
+  --amber: #ffb300;
+  --red: #ff4757;
+  --text: #e8eaf0;
+  --text-dim: #7a8094;
+  --text-muted: #3d4255;
+  --mono: 'Space Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
 }
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-
 body {
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--bg);
+  color: var(--text);
   font-family: var(--sans);
+  min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,230,118,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,230,118,0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none; z-index: 0;
+}
 
-/* ── NAV ── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 100;
+/* NAV */
+header {
+  position: relative; z-index: 10;
+  padding: 18px 32px;
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 40px;
-  height: 64px;
-  background: rgba(250,250,248,0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(10,10,10,0.08);
+  border-bottom: 1px solid var(--border);
+  background: rgba(12,13,16,0.92);
+  backdrop-filter: blur(14px);
 }
-.nav-logo {
-  display: flex; align-items: center; gap: 10px;
-  text-decoration: none;
-  color: var(--ink);
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-pulse {
+  width: 9px; height: 9px; background: var(--green); border-radius: 50%;
+  box-shadow: 0 0 10px var(--green);
+  animation: pulse 2.2s ease-in-out infinite;
 }
-.nav-logo-mark {
-  width: 28px; height: 28px;
-  background: var(--ink);
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-}
-.nav-logo-mark span {
-  font-family: var(--serif);
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--lime);
-  line-height: 1;
-}
-.nav-logo-text {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.nav-links {
-  display: flex; align-items: center; gap: 32px;
-}
-.nav-links a {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--stone);
-  text-decoration: none;
-  transition: color 0.2s;
-  letter-spacing: 0.02em;
-}
-.nav-links a:hover { color: var(--ink); }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
+.logo-name { font-family: var(--mono); font-size: 12px; color: var(--text); letter-spacing: .06em; }
+.logo-name span { color: var(--green); }
 .nav-cta {
-  background: var(--ink) !important;
-  color: var(--paper) !important;
-  padding: 9px 22px !important;
-  border-radius: 100px !important;
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  transition: background 0.2s !important;
+  font-size: 12px; font-weight: 600; color: var(--text-dim);
+  padding: 8px 18px; border: 1px solid var(--border);
+  border-radius: 6px; text-decoration: none; transition: all .2s;
 }
-.nav-cta:hover { background: var(--ink3) !important; }
+.nav-cta:hover { border-color: var(--green); color: var(--green); }
 
-/* ── HERO ── */
+/* HERO */
 .hero {
-  min-height: 100vh;
-  padding: 120px 40px 80px;
-  display: grid;
-  grid-template-columns: 1fr 440px;
-  gap: 60px;
-  align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--stone);
-  margin-bottom: 28px;
-}
-.eyebrow-dot {
-  width: 6px; height: 6px;
-  background: var(--lime-dark);
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.hero-headline {
-  font-family: var(--serif);
-  font-size: clamp(52px, 6vw, 88px);
-  font-weight: 600;
-  line-height: 1.02;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  margin-bottom: 28px;
-}
-.hero-headline em {
-  font-style: italic;
-  font-weight: 400;
-  color: var(--stone);
-}
-.hero-headline .highlight {
-  font-style: italic;
-  position: relative;
-  display: inline-block;
-}
-.hero-headline .highlight::after {
-  content: '';
-  position: absolute;
-  bottom: 4px; left: 0; right: 0;
-  height: 6px;
-  background: var(--lime);
-  z-index: -1;
-  border-radius: 2px;
-}
-
-.hero-sub {
-  font-size: 17px;
-  font-weight: 400;
-  color: var(--stone);
-  line-height: 1.65;
-  max-width: 480px;
-  margin-bottom: 40px;
-}
-
-.hero-proof {
-  display: flex; align-items: center; gap: 28px;
-  flex-wrap: wrap;
-}
-.proof-stat {
-  display: flex; flex-direction: column;
-  gap: 2px;
-}
-.proof-num {
-  font-family: var(--serif);
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1;
-  color: var(--ink);
-}
-.proof-label {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--dust);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-.proof-divider {
-  width: 1px; height: 36px;
-  background: var(--ash);
-  flex-shrink: 0;
-}
-
-/* ── HERO FORM CARD ── */
-.hero-form-card {
-  background: var(--white);
-  border: 1px solid rgba(10,10,10,0.1);
-  border-radius: 20px;
-  padding: 36px;
-  box-shadow: 0 4px 40px rgba(10,10,10,0.06), 0 1px 4px rgba(10,10,10,0.04);
-  position: sticky;
-  top: 80px;
-}
-.form-card-header {
-  margin-bottom: 28px;
-}
-.form-card-title {
-  font-family: var(--serif);
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 6px;
-  line-height: 1.2;
-}
-.form-card-sub {
-  font-size: 13px;
-  color: var(--stone);
-  line-height: 1.5;
-}
-.form-field {
-  margin-bottom: 12px;
-}
-.form-field label {
-  display: block;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--stone);
-  margin-bottom: 6px;
-}
-.form-field input {
-  width: 100%;
-  padding: 13px 16px;
-  background: var(--cloud);
-  border: 1px solid transparent;
-  border-radius: 10px;
-  font-family: var(--sans);
-  font-size: 14px;
-  color: var(--ink);
-  outline: none;
-  transition: all 0.2s;
-}
-.form-field input:focus {
-  background: var(--white);
-  border-color: var(--ink);
-  box-shadow: 0 0 0 3px rgba(10,10,10,0.06);
-}
-.form-field input::placeholder { color: var(--dust); }
-.form-field input.url-f {
-  font-size: 12px;
-  font-family: monospace;
-  letter-spacing: 0.01em;
-}
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-.run-btn {
-  width: 100%;
-  margin-top: 4px;
-  padding: 15px;
-  background: var(--ink);
-  color: var(--paper);
-  border: none;
-  border-radius: 12px;
-  font-family: var(--sans);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  letter-spacing: 0.01em;
-}
-.run-btn:hover:not(:disabled) {
-  background: var(--ink2);
-  transform: translateY(-1px);
-  box-shadow: 0 8px 28px rgba(10,10,10,0.2);
-}
-.run-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.run-btn svg { flex-shrink: 0; }
-
-.form-guarantee {
-  margin-top: 14px;
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12px;
-  color: var(--dust);
-}
-.form-guarantee svg { flex-shrink: 0; color: var(--stone); }
-
-/* ── LOADING ── */
-.loading-overlay {
-  display: none;
+  position: relative; z-index: 1;
+  max-width: 720px; margin: 0 auto;
+  padding: 72px 24px 48px;
   text-align: center;
-  padding: 40px 0 0;
 }
-.loading-overlay.show { display: block; }
-.l-spinner {
-  width: 40px; height: 40px;
-  border: 2px solid var(--ash);
-  border-top-color: var(--ink);
-  border-radius: 50%;
-  margin: 0 auto 20px;
-  animation: spin 0.7s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.l-text { font-size: 14px; color: var(--stone); font-weight: 500; }
-.l-steps {
-  list-style: none;
-  margin: 16px 0 0;
-  text-align: left;
-}
-.l-steps li {
-  font-size: 12px;
-  color: var(--dust);
-  padding: 5px 0;
-  display: flex; align-items: center; gap: 8px;
-  transition: color 0.3s;
-}
-.l-steps li.on { color: var(--ink); font-weight: 500; }
-.l-steps li.done { color: var(--stone); }
-.l-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-
-/* ── RESULTS ── */
-.results-area {
-  display: none;
-  margin-top: 0;
-}
-.results-area.show { display: block; }
-
-.score-band {
-  background: var(--ink);
-  border-radius: 14px;
-  padding: 24px;
-  display: flex; align-items: center; gap: 20px;
-  margin-bottom: 16px;
-}
-.mini-dial {
-  width: 72px; height: 72px;
-  flex-shrink: 0;
-  position: relative;
-}
-.mini-dial svg { width: 72px; height: 72px; transform: rotate(-90deg); }
-.dial-track { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 5; }
-.dial-fill {
-  fill: none; stroke-width: 5; stroke-linecap: round;
-  stroke-dasharray: 188;
-  stroke-dashoffset: 188;
-  transition: stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1);
-}
-.dial-num {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-}
-.dial-n {
-  font-family: var(--serif);
-  font-size: 22px; font-weight: 700;
-  color: var(--white); line-height: 1;
-}
-.dial-d { font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 1px; }
-.score-band-info { flex: 1; }
-.sbi-biz { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.5); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
-.sbi-headline { font-family: var(--serif); font-size: 20px; font-weight: 600; color: var(--white); line-height: 1.2; margin-bottom: 6px; }
-.sbi-verdict { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.5; }
-.sbi-grade {
-  font-size: 11px; font-weight: 600;
-  padding: 4px 12px; border-radius: 100px; margin-top: 8px; display: inline-block;
-}
-.g-poor { background: rgba(255,80,80,0.2); color: #ff8080; }
-.g-fair { background: rgba(255,200,0,0.2); color: #ffd040; }
-.g-good { background: rgba(184,240,0,0.2); color: var(--lime); }
-
-/* Category cards */
-.cats-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  margin-bottom: 14px;
-}
-.cat-c {
-  background: var(--cloud);
-  border-radius: 10px;
-  padding: 12px 14px;
-  opacity: 0; transform: translateY(8px);
-  transition: opacity 0.35s, transform 0.35s;
-}
-.cat-c.in { opacity: 1; transform: translateY(0); }
-.cc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-.cc-name { font-size: 11px; font-weight: 600; color: var(--stone); display: flex; align-items: center; gap: 5px; }
-.cc-score {
-  font-family: var(--serif); font-size: 17px; font-weight: 700;
-}
-.cc-bar-bg { height: 3px; background: var(--ash); border-radius: 10px; overflow: hidden; margin-bottom: 6px; }
-.cc-bar-f { height: 100%; border-radius: 10px; width: 0; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
-.cc-note { font-size: 10px; color: var(--stone); line-height: 1.45; }
-
-.c-green { color: #2a7a2a; }
-.c-amber { color: #8a5a00; }
-.c-red { color: #8a1a1a; }
-.b-green { background: #4caf50; }
-.b-amber { background: #ff9800; }
-.b-red { background: #f44336; }
-
-/* Top fixes in card */
-.fixes-card {
-  background: var(--white);
-  border: 1px solid var(--ash);
-  border-radius: 12px;
-  padding: 18px;
-  margin-bottom: 14px;
-}
-.fixes-title {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--stone); margin-bottom: 12px;
-  display: flex; align-items: center; gap: 6px;
-}
-.fix-row {
-  display: flex; gap: 10px;
-  padding: 9px 0;
-  border-bottom: 1px solid var(--cloud);
-  opacity: 0; transform: translateX(-6px);
-  transition: opacity 0.35s, transform 0.35s;
-}
-.fix-row:last-child { border-bottom: none; }
-.fix-row.in { opacity: 1; transform: translateX(0); }
-.fix-n {
-  width: 20px; height: 20px; flex-shrink: 0;
-  background: var(--ink);
-  color: var(--lime);
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--serif); font-size: 11px; font-weight: 700;
-}
-.fix-body h5 { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
-.fix-body p { font-size: 11px; color: var(--stone); line-height: 1.45; }
-.fix-impact { font-size: 10px; color: var(--lime-dark); font-weight: 600; margin-top: 2px; }
-
-/* PDF gate */
-.pdf-row {
-  display: flex; gap: 8px; margin-bottom: 8px;
-}
-.pdf-row input {
-  flex: 1;
-  padding: 11px 14px;
-  background: var(--cloud);
-  border: 1px solid transparent;
-  border-radius: 9px;
-  font-family: var(--sans); font-size: 13px;
-  color: var(--ink); outline: none;
-  transition: all 0.2s;
-}
-.pdf-row input:focus { background: var(--white); border-color: var(--ink); }
-.pdf-row input::placeholder { color: var(--dust); }
-.pdf-dl-btn {
-  padding: 11px 16px;
-  background: var(--lime);
-  color: var(--ink);
-  border: none; border-radius: 9px;
-  font-family: var(--sans); font-size: 12px; font-weight: 700;
-  cursor: pointer; white-space: nowrap;
-  transition: all 0.2s;
-  display: flex; align-items: center; gap: 6px;
-}
-.pdf-dl-btn:hover:not(:disabled) { background: #cbff00; box-shadow: 0 4px 16px rgba(184,240,0,0.4); }
-.pdf-dl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.pdf-note { font-size: 10px; color: var(--dust); line-height: 1.4; }
-.pdf-ok { display: none; font-size: 12px; color: #2a7a2a; font-weight: 600; margin-top: 8px; align-items: center; gap: 6px; }
-.pdf-ok.show { display: flex; }
-
-/* Error */
-.err-msg {
-  display: none; margin-top: 12px;
-  background: #fff0f0; border: 1px solid #ffcccc;
-  border-radius: 8px; padding: 12px 14px;
-  font-size: 12px; color: #cc2222; line-height: 1.5;
-}
-.err-msg.show { display: block; }
-
-/* ── SOCIAL PROOF STRIP ── */
-.proof-strip {
-  background: var(--ink);
-  padding: 56px 40px;
-  position: relative; overflow: hidden;
-}
-.proof-strip::before {
-  content: '';
-  position: absolute; top: -60px; right: -60px;
-  width: 300px; height: 300px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(184,240,0,0.12) 0%, transparent 70%);
-  pointer-events: none;
-}
-.proof-inner {
-  max-width: 1200px; margin: 0 auto;
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 40px; align-items: center;
-}
-.proof-item { text-align: center; }
-.proof-big {
-  font-family: var(--serif);
-  font-size: 56px; font-weight: 700;
-  color: var(--white); line-height: 1;
-  margin-bottom: 6px;
-}
-.proof-big span { color: var(--lime); }
-.proof-sm {
-  font-size: 12px; color: rgba(255,255,255,0.45);
-  line-height: 1.5; font-weight: 500;
-  text-transform: uppercase; letter-spacing: 0.06em;
-}
-.proof-divider-v {
-  width: 1px; height: 60px;
-  background: rgba(255,255,255,0.1);
-  margin: 0 auto;
-}
-
-/* ── HOW IT WORKS ── */
-.hiw {
-  padding: 100px 40px;
-  max-width: 1200px; margin: 0 auto;
-}
-.section-tag {
+.badge {
   display: inline-flex; align-items: center; gap: 8px;
-  font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--stone); margin-bottom: 20px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--green);
+  padding: 6px 16px; border: 1px solid var(--green-mid);
+  border-radius: 100px; background: var(--green-dim); margin-bottom: 28px;
 }
-.section-tag::before {
-  content: '';
-  display: block; width: 24px; height: 1px;
-  background: var(--stone);
+.hero h1 {
+  font-size: clamp(30px,5vw,52px); font-weight: 600;
+  line-height: 1.12; letter-spacing: -.02em; margin-bottom: 18px;
 }
-.section-title {
-  font-family: var(--serif);
-  font-size: clamp(36px, 4vw, 58px);
-  font-weight: 600; line-height: 1.1;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  margin-bottom: 60px;
-  max-width: 600px;
+.hero h1 em { font-style: normal; color: var(--green); }
+.hero p {
+  font-size: 16px; font-weight: 300; color: var(--text-dim);
+  line-height: 1.7; max-width: 520px; margin: 0 auto 16px;
 }
-.section-title em { font-style: italic; color: var(--stone); }
+.real-data-note {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--green); font-weight: 500;
+  background: var(--green-dim); border: 1px solid var(--green-mid);
+  border-radius: 8px; padding: 8px 16px; margin-bottom: 40px;
+}
 
-.steps-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-  background: var(--ash);
-  border-radius: 16px; overflow: hidden;
-}
+/* MAIN CONTAINER */
+.main { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* STEP CARDS */
 .step-card {
-  background: var(--white);
-  padding: 40px 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 16px;
+  transition: border-color .3s;
+}
+.step-card.active { border-color: var(--green); }
+.step-card.done { border-color: rgba(0,230,118,.3); opacity: .6; }
+.step-header {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 24px;
 }
 .step-num {
-  font-family: var(--serif);
-  font-size: 72px; font-weight: 700;
-  color: var(--cloud); line-height: 1;
-  margin-bottom: 20px;
-  display: block;
+  width: 32px; height: 32px; border-radius: 10px;
+  background: var(--green); color: #000;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 13px; font-weight: 700; flex-shrink: 0;
 }
-.step-icon {
-  width: 44px; height: 44px;
-  background: var(--ink);
+.step-num.done-num { background: rgba(0,230,118,.15); color: var(--green); }
+.step-title { font-size: 16px; font-weight: 600; }
+.step-sub { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+
+/* GOOGLE CONNECT BUTTON */
+.google-btn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 16px 24px;
+  background: var(--bg);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  margin-bottom: 20px;
-  font-size: 20px;
+  font-family: var(--sans); font-size: 15px; font-weight: 600;
+  color: var(--text); cursor: pointer;
+  transition: all .25s;
 }
-.step-title {
-  font-family: var(--serif);
-  font-size: 24px; font-weight: 600;
-  color: var(--ink); margin-bottom: 12px; line-height: 1.2;
-}
-.step-desc {
-  font-size: 14px; color: var(--stone); line-height: 1.65;
+.google-btn:hover { border-color: #4285f4; box-shadow: 0 0 0 3px rgba(66,133,244,.12); }
+.google-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.google-connected {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px;
+  background: var(--green-dim); border: 1px solid var(--green-mid);
+  border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--green);
 }
 
-/* ── WHAT YOU GET ── */
-.wyg {
-  background: var(--cloud);
-  padding: 100px 40px;
+/* LOCATION SELECT */
+.location-select-wrap { margin-top: 0; }
+.location-select-label {
+  font-size: 11px; font-weight: 600; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; display: block;
 }
-.wyg-inner {
-  max-width: 1200px; margin: 0 auto;
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 80px; align-items: center;
+.location-select {
+  width: 100%;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 13px 16px;
+  font-family: var(--sans); font-size: 14px; color: var(--text);
+  outline: none; cursor: pointer; transition: border-color .2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a8094' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
 }
-.wyg-list {
-  list-style: none; margin-top: 40px;
+.location-select:focus { border-color: var(--green); }
+.location-select option { background: var(--surface); }
+
+/* RUN BUTTON */
+.run-btn {
+  width: 100%; margin-top: 16px;
+  padding: 16px;
+  background: var(--green); color: #000;
+  border: none; border-radius: 12px;
+  font-family: var(--sans); font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-.wyg-list li {
-  display: flex; gap: 16px;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--ash);
+.run-btn:hover:not(:disabled) {
+  background: #00ff84; transform: translateY(-1px);
+  box-shadow: 0 8px 28px rgba(0,230,118,.3);
 }
-.wyg-list li:last-child { border-bottom: none; }
-.wyg-check {
-  width: 24px; height: 24px; flex-shrink: 0;
-  background: var(--lime);
+.run-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+/* LOADING */
+.loading-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 48px 32px; text-align: center;
+  display: none;
+}
+.loading-card.show { display: block; }
+.l-ring {
+  width: 56px; height: 56px;
+  border: 2px solid var(--border); border-top-color: var(--green);
+  border-radius: 50%; margin: 0 auto 20px;
+  animation: spin .75s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.l-title { font-size: 16px; font-weight: 600; margin-bottom: 24px; }
+.l-steps { list-style: none; max-width: 340px; margin: 0 auto; text-align: left; }
+.l-steps li {
+  font-size: 13px; color: var(--text-muted);
+  padding: 6px 0; display: flex; align-items: center; gap: 10px;
+  transition: color .4s;
+}
+.l-steps li.on { color: var(--green); font-weight: 500; }
+.l-steps li.ok { color: var(--text-dim); }
+.l-steps li.ok::before { content: '✓ '; color: var(--green); }
+.l-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+/* RESULTS */
+.results { display: none; }
+.results.show { display: block; }
+
+/* SCORE HERO */
+.score-hero {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 40px;
+  display: grid; grid-template-columns: 160px 1fr;
+  gap: 36px; align-items: center;
+  margin-bottom: 20px; position: relative; overflow: hidden;
+}
+.score-hero::after {
+  content: ''; position: absolute;
+  top: -60px; right: -60px; width: 220px; height: 220px;
   border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  margin-top: 2px;
+  background: radial-gradient(circle, var(--green-dim) 0%, transparent 70%);
+  pointer-events: none;
 }
-.wyg-check svg { color: var(--ink); }
-.wyg-item-title {
-  font-size: 15px; font-weight: 600; color: var(--ink);
-  margin-bottom: 4px;
+.score-dial { position: relative; width: 160px; height: 160px; }
+.score-svg { width: 160px; height: 160px; transform: rotate(-90deg); }
+.dial-track { fill: none; stroke: var(--border); stroke-width: 10; }
+.dial-fill {
+  fill: none; stroke-width: 10; stroke-linecap: round;
+  stroke-dasharray: 408; stroke-dashoffset: 408;
+  transition: stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1);
 }
-.wyg-item-desc { font-size: 13px; color: var(--stone); line-height: 1.55; }
+.dial-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.dial-n {
+  font-family: var(--mono); font-size: 42px; font-weight: 700;
+  color: var(--green); line-height: 1;
+}
+.dial-max { font-size: 11px; color: var(--text-muted); font-family: var(--mono); margin-top: 2px; }
+.score-meta { }
+.score-biz { font-family: var(--mono); font-size: 11px; color: var(--green); letter-spacing: .06em; margin-bottom: 6px; }
+.score-headline { font-size: 22px; font-weight: 600; line-height: 1.2; margin-bottom: 10px; }
+.score-verdict { font-size: 14px; color: var(--text-dim); line-height: 1.65; margin-bottom: 14px; }
+.grade-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 100px;
+}
+.grade-poor { background: rgba(255,71,87,.12); color: var(--red); border: 1px solid rgba(255,71,87,.3); }
+.grade-fair { background: rgba(255,179,0,.12); color: var(--amber); border: 1px solid rgba(255,179,0,.3); }
+.grade-good { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-mid); }
 
-.wyg-visual {
-  position: relative;
+/* REAL DATA CALLOUT */
+.real-data-callout {
+  background: var(--green-dim); border: 1px solid var(--green-mid);
+  border-radius: 10px; padding: 14px 18px;
+  font-size: 12px; color: var(--green); margin-bottom: 20px;
+  display: flex; align-items: flex-start; gap: 10px; line-height: 1.5;
 }
-.wyg-card-stack {
-  position: relative;
-  height: 440px;
-}
-.wyg-card {
-  position: absolute;
-  background: var(--white);
-  border-radius: 16px;
-  border: 1px solid rgba(10,10,10,0.08);
-  box-shadow: 0 8px 32px rgba(10,10,10,0.08);
-  padding: 24px;
-}
-.wyg-card-1 {
-  top: 0; left: 0; right: 0;
-  z-index: 3;
-  transform: rotate(-1.5deg);
-}
-.wyg-card-2 {
-  top: 40px; left: 20px; right: -20px;
-  z-index: 2;
-  transform: rotate(1deg);
-}
-.wyg-card-3 {
-  top: 80px; left: 10px; right: 10px;
-  z-index: 1;
-  transform: rotate(-0.5deg);
-}
-.mock-score-big {
-  font-family: var(--serif);
-  font-size: 64px; font-weight: 700;
-  color: var(--ink); line-height: 1;
-}
-.mock-score-big span { color: #d4d4d4; font-size: 36px; }
-.mock-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--dust); margin-bottom: 6px; }
-.mock-grade-pill {
-  display: inline-flex; padding: 4px 14px;
-  border-radius: 100px; font-size: 11px; font-weight: 600;
-  background: rgba(76,175,80,0.12); color: #2a7a2a;
-  border: 1px solid rgba(76,175,80,0.2);
-  margin-top: 8px;
-}
-.mock-bar-row { margin: 12px 0; }
-.mock-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--stone); margin-bottom: 5px; }
-.mock-bar-bg { height: 6px; background: var(--cloud); border-radius: 10px; overflow: hidden; }
-.mock-bar-fill { height: 100%; border-radius: 10px; }
 
-/* ── CATEGORIES EXPLAINER ── */
-.cats-explain {
-  padding: 100px 40px;
-  max-width: 1200px; margin: 0 auto;
+/* DATA SUMMARY */
+.data-summary {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px; margin-bottom: 20px;
 }
-.cats-ex-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px; margin-top: 48px;
+.ds-title {
+  font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 16px;
 }
-.cat-ex-card {
-  padding: 28px 24px;
-  border: 1px solid var(--ash);
-  border-radius: 14px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+.ds-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.ds-item { text-align: center; }
+.ds-val {
+  font-family: var(--mono); font-size: 24px; font-weight: 700;
+  color: var(--text); line-height: 1; margin-bottom: 4px;
 }
-.cat-ex-card:hover {
-  border-color: var(--ink);
-  box-shadow: 0 4px 20px rgba(10,10,10,0.06);
-}
-.cat-ex-icon { font-size: 28px; margin-bottom: 14px; display: block; }
-.cat-ex-points {
-  font-family: var(--serif);
-  font-size: 32px; font-weight: 700;
-  color: var(--ink); line-height: 1; margin-bottom: 4px;
-}
-.cat-ex-pts-label { font-size: 10px; color: var(--dust); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
-.cat-ex-name { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
-.cat-ex-desc { font-size: 12px; color: var(--stone); line-height: 1.5; }
+.ds-val.good { color: var(--green); }
+.ds-val.warn { color: var(--amber); }
+.ds-val.bad { color: var(--red); }
+.ds-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
 
-/* ── TESTIMONIALS ── */
-.testimonials {
-  background: var(--ink);
-  padding: 100px 40px;
+/* CATEGORIES */
+.cats-title {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px;
 }
-.testimonials-inner { max-width: 1200px; margin: 0 auto; }
-.testimonials .section-title { color: var(--white); }
-.testimonials .section-tag { color: rgba(255,255,255,0.4); }
-.testimonials .section-tag::before { background: rgba(255,255,255,0.3); }
+.cats-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  gap: 12px; margin-bottom: 20px;
+}
+.cat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 13px; padding: 18px;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity .4s, transform .4s, border-color .2s;
+}
+.cat-card.in { opacity: 1; transform: none; }
+.cat-card:hover { border-color: var(--text-muted); }
+.cc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.cc-name { font-size: 12px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
+.cc-score { font-family: var(--mono); font-size: 17px; font-weight: 700; }
+.c-g { color: var(--green); }
+.c-a { color: var(--amber); }
+.c-r { color: var(--red); }
+.cc-bar { height: 3px; background: var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+.cc-fill { height: 100%; border-radius: 10px; width: 0; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+.cc-note { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.cc-real { font-size: 10px; color: var(--text-muted); margin-top: 6px; font-family: var(--mono); }
 
-.testi-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 16px; margin-top: 48px;
+/* FIXES */
+.fixes-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px; margin-bottom: 20px;
 }
-.testi-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 28px;
+.fixes-head {
+  font-size: 13px; font-weight: 600; color: var(--text);
+  display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
 }
-.testi-stars { color: var(--lime); font-size: 14px; margin-bottom: 16px; letter-spacing: 2px; }
-.testi-quote {
-  font-family: var(--serif);
-  font-size: 18px; font-style: italic;
-  color: rgba(255,255,255,0.85); line-height: 1.55;
-  margin-bottom: 20px;
+.fix-row {
+  display: flex; gap: 14px; padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  opacity: 0; transform: translateX(-6px);
+  transition: opacity .4s, transform .4s;
 }
-.testi-author { display: flex; align-items: center; gap: 12px; }
-.testi-avatar {
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  background: var(--lime);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--serif); font-size: 15px; font-weight: 700;
-  color: var(--ink); flex-shrink: 0;
+.fix-row:last-child { border-bottom: none; }
+.fix-row.in { opacity: 1; transform: none; }
+.fix-n {
+  width: 26px; height: 26px; flex-shrink: 0;
+  background: var(--green-dim); border: 1px solid var(--green-mid);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--green);
 }
-.testi-name { font-size: 13px; font-weight: 600; color: var(--white); }
-.testi-biz { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 1px; }
+.fix-body h5 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.fix-body p { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+.fix-impact { font-size: 11px; font-family: var(--mono); color: var(--amber); margin-top: 3px; }
 
-/* ── FAQ ── */
-.faq-section {
-  padding: 100px 40px;
-  max-width: 800px; margin: 0 auto;
-}
-.faq-item {
-  border-bottom: 1px solid var(--ash);
-  padding: 24px 0;
-}
-.faq-q {
-  font-family: var(--serif);
-  font-size: 20px; font-weight: 600;
-  color: var(--ink); cursor: pointer;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 20px; line-height: 1.3;
-  user-select: none;
-}
-.faq-q:hover { color: var(--stone); }
-.faq-chevron {
-  flex-shrink: 0; transition: transform 0.3s;
-  color: var(--stone);
-}
-.faq-item.open .faq-chevron { transform: rotate(180deg); }
-.faq-a {
-  font-size: 15px; color: var(--stone); line-height: 1.65;
-  max-height: 0; overflow: hidden;
-  transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), padding 0.35s;
-}
-.faq-item.open .faq-a { max-height: 300px; padding-top: 14px; }
-
-/* ── BOTTOM CTA ── */
-.bottom-cta {
-  background: var(--lime);
-  padding: 80px 40px;
-  text-align: center;
+/* PDF + CTA */
+.pdf-section {
+  background: linear-gradient(135deg, var(--surface), var(--surface2));
+  border: 1px solid var(--border); border-radius: 16px;
+  padding: 32px; text-align: center; margin-bottom: 20px;
   position: relative; overflow: hidden;
 }
-.bottom-cta::before {
-  content: 'FREE';
-  position: absolute;
-  font-family: var(--serif);
-  font-size: 280px; font-weight: 700;
-  color: rgba(10,10,10,0.05);
-  top: -60px; left: 50%;
-  transform: translateX(-50%);
-  line-height: 1;
+.pdf-section::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, var(--green-dim), transparent 60%);
   pointer-events: none;
-  white-space: nowrap;
 }
-.bcta-inner { position: relative; z-index: 1; }
-.bcta-title {
-  font-family: var(--serif);
-  font-size: clamp(36px, 5vw, 64px);
-  font-weight: 700; line-height: 1.05;
-  color: var(--ink); margin-bottom: 16px;
-  letter-spacing: -0.02em;
+.pdf-section h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; position: relative; }
+.pdf-section p { font-size: 13px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.6; position: relative; }
+.pdf-row { display: flex; gap: 10px; max-width: 460px; margin: 0 auto 10px; position: relative; }
+.pdf-row input {
+  flex: 1; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 10px; padding: 13px 16px;
+  font-family: var(--sans); font-size: 14px; color: var(--text); outline: none;
+  transition: border-color .2s;
 }
-.bcta-sub {
-  font-size: 16px; color: rgba(10,10,10,0.6);
-  margin-bottom: 36px; line-height: 1.6;
-  max-width: 480px; margin-left: auto; margin-right: auto;
+.pdf-row input:focus { border-color: var(--green); }
+.pdf-row input::placeholder { color: var(--text-muted); }
+.pdf-btn {
+  padding: 13px 20px; background: var(--green); color: #000;
+  border: none; border-radius: 10px;
+  font-family: var(--sans); font-size: 13px; font-weight: 700;
+  cursor: pointer; white-space: nowrap; transition: all .2s;
+  display: flex; align-items: center; gap: 6px;
 }
-.bcta-btn {
-  display: inline-flex; align-items: center; gap: 10px;
-  padding: 17px 40px;
-  background: var(--ink);
-  color: var(--paper);
-  border-radius: 100px;
-  font-size: 16px; font-weight: 600;
-  text-decoration: none;
-  transition: all 0.25s;
-  letter-spacing: 0.01em;
+.pdf-btn:hover:not(:disabled) { background: #00ff84; box-shadow: 0 6px 20px rgba(0,230,118,.3); }
+.pdf-btn:disabled { opacity: .45; cursor: not-allowed; }
+.pdf-note { font-size: 11px; color: var(--text-muted); position: relative; }
+.pdf-ok {
+  display: none; color: var(--green); font-size: 13px; font-weight: 600;
+  margin-top: 14px; align-items: center; justify-content: center; gap: 6px; position: relative;
 }
-.bcta-btn:hover {
-  background: var(--ink2);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(10,10,10,0.25);
-}
-.bcta-note { font-size: 13px; color: rgba(10,10,10,0.5); margin-top: 16px; }
+.pdf-ok.show { display: flex; }
 
-/* ── FOOTER ── */
-footer {
-  background: var(--ink);
-  padding: 48px 40px;
+.cta-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 32px;
   display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 20px;
+  gap: 20px; flex-wrap: wrap;
 }
-.footer-logo {
-  font-family: var(--serif);
-  font-size: 20px; font-weight: 700;
-  color: var(--white); text-decoration: none;
+.cta-text h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+.cta-text p { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+.cta-btn {
+  padding: 13px 26px; background: var(--green); color: #000;
+  border-radius: 10px; text-decoration: none;
+  font-family: var(--sans); font-size: 14px; font-weight: 700;
+  white-space: nowrap; transition: all .2s; flex-shrink: 0;
 }
-.footer-logo span { color: var(--lime); }
-.footer-links {
-  display: flex; gap: 28px; align-items: center;
-}
-.footer-links a {
-  font-size: 12px; color: rgba(255,255,255,0.4);
-  text-decoration: none; transition: color 0.2s;
-  letter-spacing: 0.04em;
-}
-.footer-links a:hover { color: rgba(255,255,255,0.8); }
-.footer-right { font-size: 12px; color: rgba(255,255,255,0.3); }
+.cta-btn:hover { background: #00ff84; box-shadow: 0 6px 20px rgba(0,230,118,.25); }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 900px) {
-  .hero { grid-template-columns: 1fr; padding-bottom: 60px; }
-  .hero-form-card { position: static; }
-  .proof-inner { grid-template-columns: repeat(2, 1fr); }
-  .proof-divider-v { display: none; }
-  .steps-grid { grid-template-columns: 1fr; gap: 2px; }
-  .wyg-inner { grid-template-columns: 1fr; }
-  .wyg-visual { display: none; }
-  .cats-ex-grid { grid-template-columns: repeat(2, 1fr); }
-  .testi-grid { grid-template-columns: 1fr; }
-  nav { padding: 0 20px; }
-  .nav-links { display: none; }
-  .hero { padding: 100px 20px 60px; }
-  .proof-strip, .hiw, .wyg, .cats-explain, .faq-section, .bottom-cta { padding-left: 20px; padding-right: 20px; }
-  .testimonials { padding-left: 20px; padding-right: 20px; }
-}
+/* ERRORS */
+.err { display: none; background: rgba(255,71,87,.08); border: 1px solid rgba(255,71,87,.3); border-radius: 10px; padding: 16px; font-size: 13px; color: var(--red); margin-bottom: 16px; line-height: 1.5; }
+.err.show { display: block; }
 
-/* ── PAGE LOAD ANIMATION ── */
-.fade-in {
-  opacity: 0; transform: translateY(20px);
-  animation: fadeUp 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
+/* Footer */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border); padding: 24px 32px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
 }
-.fade-in:nth-child(1) { animation-delay: 0.1s; }
-.fade-in:nth-child(2) { animation-delay: 0.2s; }
-.fade-in:nth-child(3) { animation-delay: 0.3s; }
-.fade-in:nth-child(4) { animation-delay: 0.4s; }
-@keyframes fadeUp {
-  to { opacity: 1; transform: translateY(0); }
-}
+footer p { font-size: 12px; color: var(--text-muted); }
+footer a { color: var(--text-dim); text-decoration: none; }
+footer a:hover { color: var(--green); }
 
-/* Scroll reveal */
-.reveal {
-  opacity: 0; transform: translateY(24px);
-  transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+@media(max-width:600px){
+  .score-hero { grid-template-columns: 1fr; text-align: center; }
+  .score-dial { margin: 0 auto; }
+  .cats-grid { grid-template-columns: 1fr; }
+  .ds-grid { grid-template-columns: repeat(2,1fr); }
+  .pdf-row { flex-direction: column; }
+  .cta-card { flex-direction: column; }
 }
-.reveal.visible { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a href="https://www.purplecrib.ng" class="nav-logo">
-    <div class="nav-logo-mark"><span>P</span></div>
-    <span class="nav-logo-text">Purple Crib Studios</span>
+<header>
+  <a href="https://www.purplecrib.ng" class="logo">
+    <div class="logo-pulse"></div>
+    <span class="logo-name">PURPLE<span>CRIB</span>.STUDIOS</span>
   </a>
-  <div class="nav-links">
-    <a href="https://www.purplecrib.ng/google-my-business">Services</a>
-    <a href="https://www.purplecrib.ng/blog">Blog</a>
-    <a href="https://www.purplecrib.ng/about">About</a>
-    <a href="https://wa.me/+2348180002345" target="_blank" class="nav-cta">Book a Call</a>
-  </div>
-</nav>
+  <a href="https://wa.me/+2348180002345" class="nav-cta" target="_blank">Book a Call →</a>
+</header>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-left">
-    <div class="fade-in">
-      <div class="hero-eyebrow"><span class="eyebrow-dot"></span>AI-Powered · Free · Instant Results</div>
-    </div>
-    <h1 class="hero-headline fade-in">
-      Find out why you're<br/>
-      <span class="highlight">invisible</span> on<br/>
-      Google Maps
-    </h1>
-    <p class="hero-sub fade-in">
-      Enter your Google Business Profile URL below. Our AI audits 8 critical ranking factors, scores your profile out of 100, and shows you exactly what to fix — in under 60 seconds.
-    </p>
-    <div class="hero-proof fade-in">
-      <div class="proof-stat">
-        <div class="proof-num">8</div>
-        <div class="proof-label">Ranking factors</div>
-      </div>
-      <div class="proof-divider"></div>
-      <div class="proof-stat">
-        <div class="proof-num">60s</div>
-        <div class="proof-label">To your score</div>
-      </div>
-      <div class="proof-divider"></div>
-      <div class="proof-stat">
-        <div class="proof-num">100%</div>
-        <div class="proof-label">Free, always</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FORM CARD -->
-  <div class="hero-form-card" id="mainFormCard">
-    <div class="form-card-header">
-      <div class="form-card-title">Run Your Free Audit</div>
-      <div class="form-card-sub">No account needed. Results in 60 seconds.</div>
-    </div>
-
-    <div id="formSection">
-      <div class="form-field">
-        <label>Google Business Profile URL</label>
-        <input type="url" id="gbpUrl" class="url-f"
-          placeholder="maps.google.com/?cid=... or g.page/..."
-          autocomplete="off" spellcheck="false"/>
-      </div>
-      <div class="form-row">
-        <div class="form-field" style="margin:0">
-          <label>Business Name</label>
-          <input type="text" id="bizName" placeholder="e.g. Zinc Restaurant"/>
-        </div>
-        <div class="form-field" style="margin:0">
-          <label>City</label>
-          <input type="text" id="bizCity" placeholder="e.g. Lagos, London"/>
-        </div>
-      </div>
-      <button class="run-btn" id="runBtn" onclick="runAudit()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Run Free Audit Now
-      </button>
-      <div class="form-guarantee">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        No account. No credit card. 100% free.
-      </div>
-      <div class="err-msg" id="errMsg"></div>
-    </div>
-
-    <!-- Loading -->
-    <div class="loading-overlay" id="loadingSection">
-      <div class="l-spinner"></div>
-      <div class="l-text" id="lText">Analysing your profile...</div>
-      <ul class="l-steps" id="lSteps">
-        <li id="ls1"><span class="l-dot"></span>Fetching profile data</li>
-        <li id="ls2"><span class="l-dot"></span>Auditing completeness</li>
-        <li id="ls3"><span class="l-dot"></span>Analysing review signals</li>
-        <li id="ls4"><span class="l-dot"></span>Checking photos &amp; posts</li>
-        <li id="ls5"><span class="l-dot"></span>Evaluating category strategy</li>
-        <li id="ls6"><span class="l-dot"></span>Scoring &amp; generating report</li>
-      </ul>
-    </div>
-
-    <!-- Results -->
-    <div class="results-area" id="resultsSection">
-      <!-- Score band -->
-      <div class="score-band" id="scoreBand">
-        <div class="mini-dial">
-          <svg viewBox="0 0 72 72">
-            <circle class="dial-track" cx="36" cy="36" r="30"/>
-            <circle class="dial-fill" id="dialFill" cx="36" cy="36" r="30"/>
-          </svg>
-          <div class="dial-num">
-            <div class="dial-n" id="dialNum">0</div>
-            <div class="dial-d">/100</div>
-          </div>
-        </div>
-        <div class="score-band-info">
-          <div class="sbi-biz" id="sbiBiz"></div>
-          <div class="sbi-headline" id="sbiHead"></div>
-          <div class="sbi-verdict" id="sbiVerdict"></div>
-          <span class="sbi-grade" id="sbiGrade"></span>
-        </div>
-      </div>
-
-      <!-- Categories -->
-      <div class="cats-grid" id="catsGrid"></div>
-
-      <!-- Fixes -->
-      <div class="fixes-card">
-        <div class="fixes-title">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Top Priority Fixes
-        </div>
-        <div id="fixList"></div>
-      </div>
-
-      <!-- PDF gate -->
-      <div class="fixes-card" style="margin-bottom:0">
-        <div class="fixes-title">Download Full PDF Report</div>
-        <div class="pdf-row">
-          <input type="email" id="pdfEmail" placeholder="Your email address"/>
-          <button class="pdf-dl-btn" id="pdfBtn" onclick="doDownload()">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            Get PDF
-          </button>
-        </div>
-        <div class="pdf-note">3-page branded report + 90-day action plan. You'll also receive a follow-up email with tips.</div>
-        <div class="pdf-ok" id="pdfOk">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          Downloading! Check your email for the full report.
-        </div>
-        <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--cloud); display:flex; justify-content:center;">
-          <a href="https://wa.me/+2348180002345" target="_blank" style="font-size:12px;font-weight:600;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:6px;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.59 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Want us to fix this for you? Book a free call →
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PROOF STRIP -->
-<div class="proof-strip reveal">
-  <div class="proof-inner">
-    <div class="proof-item">
-      <div class="proof-big">8<span>×</span></div>
-      <div class="proof-sm">Factors audited<br/>in 60 seconds</div>
-    </div>
-    <div class="proof-divider-v"></div>
-    <div class="proof-item">
-      <div class="proof-big">3<span>+</span></div>
-      <div class="proof-sm">Markets covered<br/>Nigeria · UK · US</div>
-    </div>
-    <div class="proof-divider-v"></div>
-    <div class="proof-item">
-      <div class="proof-big">100<span>pts</span></div>
-      <div class="proof-sm">Maximum score<br/>across all categories</div>
-    </div>
-    <div class="proof-divider-v"></div>
-    <div class="proof-item">
-      <div class="proof-big">0<span>₦</span></div>
-      <div class="proof-sm">Cost to run<br/>your audit today</div>
-    </div>
+<div class="hero">
+  <div class="badge"><span>●</span> Real API Data · Not AI Guesses</div>
+  <h1>Your Google Business Profile,<br/><em>actually scored</em></h1>
+  <p>Connect your Google account and we pull your real GMB data directly from Google's API — exact photo counts, real review numbers, actual service listings. Then we score it and show you exactly what to fix.</p>
+  <div class="real-data-note">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+    Powered by Google Business Profile API v1 · No guessing, no estimation
   </div>
 </div>
 
-<!-- HOW IT WORKS -->
-<section class="hiw reveal">
-  <div class="section-tag">How it works</div>
-  <h2 class="section-title">From URL to action plan <em>in three steps</em></h2>
-  <div class="steps-grid">
-    <div class="step-card">
-      <span class="step-num">01</span>
-      <div class="step-icon">🔗</div>
-      <div class="step-title">Enter your GBP URL</div>
-      <p class="step-desc">Paste your Google Business Profile URL or Google Maps link. Add your business name and city for a more precise competitive analysis.</p>
-    </div>
-    <div class="step-card">
-      <span class="step-num">02</span>
-      <div class="step-icon">🤖</div>
-      <div class="step-title">AI audits 8 factors</div>
-      <p class="step-desc">Our AI analyses your profile across 8 critical ranking factors — completeness, photos, reviews, posts, categories, Q&A, services, and schema signals — scoring each out of its maximum.</p>
-    </div>
-    <div class="step-card">
-      <span class="step-num">03</span>
-      <div class="step-icon">📋</div>
-      <div class="step-title">Get your action plan</div>
-      <p class="step-desc">See your score instantly on screen. Download a full 3-page PDF report with category breakdowns, competitor context, and a prioritised 90-day fix list.</p>
-    </div>
-  </div>
-</section>
+<div class="main">
 
-<!-- WHAT YOU GET -->
-<section class="wyg reveal">
-  <div class="wyg-inner">
-    <div>
-      <div class="section-tag">What's included</div>
-      <h2 class="section-title">Everything in your <em>free report</em></h2>
-      <ul class="wyg-list">
-        <li>
-          <div class="wyg-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div>
-            <div class="wyg-item-title">Overall visibility score (0–100)</div>
-            <div class="wyg-item-desc">A single number that tells you exactly how optimised your profile is compared to what Google wants to see to rank you in the Map Pack.</div>
-          </div>
-        </li>
-        <li>
-          <div class="wyg-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div>
-            <div class="wyg-item-title">8-category breakdown</div>
-            <div class="wyg-item-desc">Individual scores for completeness, photos, reviews, Google Posts, categories, Q&A, services, and website/schema signals — so you know exactly which area to fix first.</div>
-          </div>
-        </li>
-        <li>
-          <div class="wyg-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div>
-            <div class="wyg-item-title">Top 5 priority fixes</div>
-            <div class="wyg-item-desc">Ranked by estimated ranking impact — High Impact, Medium Impact, and Quick Wins. Start with number one and work your way down.</div>
-          </div>
-        </li>
-        <li>
-          <div class="wyg-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div>
-            <div class="wyg-item-title">3-page PDF report</div>
-            <div class="wyg-item-desc">A professionally formatted, branded PDF you can download, share with your team, or use as a brief for an agency. Includes all scores, findings, and your full action plan.</div>
-          </div>
-        </li>
-        <li>
-          <div class="wyg-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
-          <div>
-            <div class="wyg-item-title">Competitor context</div>
-            <div class="wyg-item-desc">What your top Map Pack competitors typically do well in your market — so you understand the competitive gap you're closing.</div>
-          </div>
-        </li>
-      </ul>
+  <div class="err" id="errBox"></div>
+
+  <!-- STEP 1: Connect Google -->
+  <div class="step-card active" id="step1Card">
+    <div class="step-header">
+      <div class="step-num" id="step1Num">1</div>
+      <div>
+        <div class="step-title">Connect your Google Account</div>
+        <div class="step-sub">We request read-only access to your Google Business Profile</div>
+      </div>
     </div>
-    <div class="wyg-visual">
-      <div class="wyg-card-stack">
-        <div class="wyg-card wyg-card-3">
-          <div class="mock-label">Category Score</div>
-          <div class="mock-bar-row">
-            <div class="mock-bar-label"><span>📷 Photos</span><span style="font-weight:600">9/15</span></div>
-            <div class="mock-bar-bg"><div class="mock-bar-fill" style="width:60%;background:#ff9800"></div></div>
-          </div>
-          <div class="mock-bar-row">
-            <div class="mock-bar-label"><span>⭐ Reviews</span><span style="font-weight:600">16/20</span></div>
-            <div class="mock-bar-bg"><div class="mock-bar-fill" style="width:80%;background:#4caf50"></div></div>
-          </div>
-        </div>
-        <div class="wyg-card wyg-card-2">
-          <div class="mock-label">Priority Fix #1</div>
-          <div style="font-size:15px;font-weight:600;color:#0a0a0a;margin:8px 0 4px">Add 25+ more photos</div>
-          <div style="font-size:12px;color:#5a5a5a;line-height:1.5">Profiles with 100+ photos receive 520% more calls. You currently have an estimated 12. Upload 25 this week.</div>
-          <div style="font-size:11px;color:#8fb800;font-weight:700;margin-top:6px">⚡ High Impact</div>
-        </div>
-        <div class="wyg-card wyg-card-1">
-          <div class="mock-label">Overall Score</div>
-          <div class="mock-score-big">61<span>/100</span></div>
-          <div class="mock-grade-pill">🟡 Fair — Moderate optimisation needed</div>
-          <div style="font-size:12px;color:#5a5a5a;margin-top:12px;line-height:1.5">Your profile has a solid foundation but is missing key signals that competitors in your Map Pack are leveraging.</div>
-        </div>
+    <div id="connectSection">
+      <button class="google-btn" id="googleSignInBtn" onclick="connectGoogle()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Sign in with Google
+      </button>
+    </div>
+    <div id="connectedSection" style="display:none">
+      <div class="google-connected">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="connectedEmail">Connected to Google</span>
       </div>
     </div>
   </div>
-</section>
 
-<!-- WHAT WE SCORE -->
-<section class="cats-explain reveal">
-  <div class="section-tag">The scoring system</div>
-  <h2 class="section-title">8 factors. <em>100 points.</em></h2>
-  <div class="cats-ex-grid">
-    <div class="cat-ex-card">
-      <span class="cat-ex-icon">📋</span>
-      <div class="cat-ex-points">20</div>
-      <div class="cat-ex-pts-label">points</div>
-      <div class="cat-ex-name">Profile Completeness</div>
-      <div class="cat-ex-desc">Name, address, phone, website, hours, categories, description. Missing any single field costs ranking.</div>
-    </div>
-    <div class="cat-ex-card">
-      <span class="cat-ex-icon">⭐</span>
-      <div class="cat-ex-points">20</div>
-      <div class="cat-ex-pts-label">points</div>
-      <div class="cat-ex-name">Reviews & Reputation</div>
-      <div class="cat-ex-desc">Star rating, review count, recency velocity. The single highest-leverage ranking factor after categories.</div>
-    </div>
-    <div class="cat-ex-card">
-      <span class="cat-ex-icon">📷</span>
-      <div class="cat-ex-points">15</div>
-      <div class="cat-ex-pts-label">points</div>
-      <div class="cat-ex-name">Photos & Visuals</div>
-      <div class="cat-ex-desc">Count, variety, cover + logo presence. Profiles with 100+ photos receive 520% more calls.</div>
-    </div>
-    <div class="cat-ex-card">
-      <span class="cat-ex-icon">📢</span>
-      <div class="cat-ex-points">10</div>
-      <div class="cat-ex-pts-label">points</div>
-      <div class="cat-ex-name">Google Posts</div>
-      <div class="cat-ex-desc">Activity recency and frequency. Posts appear in your Map Pack listing — free advertising space most businesses ignore.</div>
-    </div>
-    <div class="cat-ex-card">
-      <span class="cat-ex-icon">🏷️</span>
-      <div class="cat-ex-points">10</div>
-      <div class="cat-ex-pts-label">points</div>
-      <div class="cat-ex-name">Category Strategy</div>
-      <div class="cat-ex-desc">Primary and secondary categories. Each additional relevant category unlocks separate Map Pack appearances.</div>
-    </div>
-    <div class="cat-ex-card">
-      <span class="cat-ex-icon">⚙️</span>
-      <div class="cat-ex-points">10</div>
-      <div class="cat-ex-pts-label">points</div>
-      <div class="cat-ex-name">Services & Products</div>
-      <div class="cat-ex-desc">Service listing completeness. Each service is independently indexed — missing listings = invisible for those searches.</div>
-    </div>
-    <div class="cat-ex-card">
-      <span class="cat-ex-icon">🤖</span>
-      <div class="cat-ex-points">10</div>
-      <div class="cat-ex-pts-label">points</div>
-      <div class="cat-ex-name">Website & AI Signals</div>
-      <div class="cat-ex-desc">Website linked, schema markup present, AI search visibility indicators. Critical for 2026 search landscape.</div>
-    </div>
-    <div class="cat-ex-card">
-      <span class="cat-ex-icon">💬</span>
-      <div class="cat-ex-points">5</div>
-      <div class="cat-ex-pts-label">points</div>
-      <div class="cat-ex-name">Q&A Section</div>
-      <div class="cat-ex-desc">Populated with relevant questions and keyword-rich answers. Indexed text that expands your relevance surface area.</div>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section class="testimonials reveal">
-  <div class="testimonials-inner">
-    <div class="section-tag">What clients say</div>
-    <h2 class="section-title">Results that<br/><em>speak for themselves</em></h2>
-    <div class="testi-grid">
-      <div class="testi-card">
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-quote">"We went from page 2 on Google Maps to consistently appearing in the top 3 for every major search in our area. The audit identified exactly what was holding us back."</div>
-        <div class="testi-author">
-          <div class="testi-avatar">A</div>
-          <div>
-            <div class="testi-name">Amara O.</div>
-            <div class="testi-biz">Restaurant Owner, Lagos Island</div>
-          </div>
-        </div>
-      </div>
-      <div class="testi-card">
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-quote">"The free audit scored us 38/100 and identified 5 specific issues. After implementing the fixes ourselves, we jumped to 67. We then hired Purple Crib to push it further."</div>
-        <div class="testi-author">
-          <div class="testi-avatar">J</div>
-          <div>
-            <div class="testi-name">James K.</div>
-            <div class="testi-biz">Dental Practice, Manchester</div>
-          </div>
-        </div>
-      </div>
-      <div class="testi-card">
-        <div class="testi-stars">★★★★★</div>
-        <div class="testi-quote">"Phone calls from Google Maps increased by 340% in 90 days. The audit was the starting point — it showed us exactly where we were losing customers every day."</div>
-        <div class="testi-author">
-          <div class="testi-avatar">S</div>
-          <div>
-            <div class="testi-name">Sarah M.</div>
-            <div class="testi-biz">Law Firm, New York</div>
-          </div>
-        </div>
+  <!-- STEP 2: Select location -->
+  <div class="step-card" id="step2Card" style="opacity:.4;pointer-events:none">
+    <div class="step-header">
+      <div class="step-num" id="step2Num">2</div>
+      <div>
+        <div class="step-title">Select your business location</div>
+        <div class="step-sub">Choose which Google Business Profile to audit</div>
       </div>
     </div>
+    <div class="location-select-wrap">
+      <label class="location-select-label">Your Locations</label>
+      <select class="location-select" id="locationSelect">
+        <option value="">Loading your locations...</option>
+      </select>
+      <button class="run-btn" id="runBtn" onclick="runRealAudit()" disabled>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Run Real GMB Audit
+      </button>
+    </div>
   </div>
-</section>
 
-<!-- FAQ -->
-<section class="faq-section reveal">
-  <div class="section-tag">Questions</div>
-  <h2 class="section-title" style="margin-bottom:40px">Everything you need <em>to know</em></h2>
+  <!-- LOADING -->
+  <div class="loading-card" id="loadingCard">
+    <div class="l-ring"></div>
+    <div class="l-title">Fetching your real GMB data...</div>
+    <ul class="l-steps" id="lSteps">
+      <li id="ls1"><span class="l-dot"></span>Authenticating with Google API</li>
+      <li id="ls2"><span class="l-dot"></span>Reading profile — name, address, hours, categories</li>
+      <li id="ls3"><span class="l-dot"></span>Fetching reviews — count, rating, response rate</li>
+      <li id="ls4"><span class="l-dot"></span>Counting photos by category</li>
+      <li id="ls5"><span class="l-dot"></span>Reading Google Posts activity</li>
+      <li id="ls6"><span class="l-dot"></span>Checking Q&amp;A and service listings</li>
+      <li id="ls7"><span class="l-dot"></span>Scoring with Claude AI and generating recommendations</li>
+    </ul>
+  </div>
 
-  <div class="faq-item">
-    <div class="faq-q" onclick="toggleFaq(this)">
-      Is this audit really free?
-      <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="faq-a">Yes — completely free, no credit card required, no account needed. You enter your GBP URL, get your score on screen instantly, and can download the full PDF report by entering your email. We offer it free because a significant number of businesses that see their score choose to work with us to fix their profile.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q" onclick="toggleFaq(this)">
-      How accurate is the AI audit?
-      <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="faq-a">The audit is powered by Claude AI (Anthropic) and analyses your profile based on Google's documented ranking factors and industry benchmarks. It provides directional scoring and the most impactful optimisation opportunities. For a pixel-perfect technical audit with live data pulls from the Google API, our paid audit service provides full precision.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q" onclick="toggleFaq(this)">
-      What do I do with the score?
-      <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="faq-a">Start with fix number one in your priority list and work down. Most Quick Win fixes can be implemented in under 30 minutes directly in your Google Business Profile dashboard. High Impact fixes (like building a review acquisition system) require a more systematic approach — which is where our managed service delivers the biggest results.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q" onclick="toggleFaq(this)">
-      Do you work with businesses outside Nigeria?
-      <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="faq-a">Yes — we serve businesses in Nigeria, the UK, and the US. The audit tool works for any Google Business Profile globally. Our managed service operates across Lagos, Abuja, London, Manchester, New York, Chicago, Miami, and all major markets in our three core regions.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q" onclick="toggleFaq(this)">
-      What happens after I enter my email for the PDF?
-      <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="faq-a">Your PDF downloads immediately. You'll also receive a follow-up email with your top fix broken down in more detail, and a brief email sequence with GMB optimisation tips over the following week. You can unsubscribe at any time. We never share your data with third parties.</div>
-  </div>
-  <div class="faq-item">
-    <div class="faq-q" onclick="toggleFaq(this)">
-      How long does GMB optimisation take to show results?
-      <svg class="faq-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="faq-a">Quick wins like category updates, description rewrites, and photo uploads can show Map Pack movement within 2–4 weeks. Review velocity improvements typically take 30–60 days to reflect in rankings. Citation corrections take 60–90 days to propagate. Our Nigerian market clients see results fastest due to lower competitive baselines.</div>
-  </div>
-</section>
+  <!-- RESULTS -->
+  <div class="results" id="results">
 
-<!-- BOTTOM CTA -->
-<section class="bottom-cta reveal">
-  <div class="bcta-inner">
-    <h2 class="bcta-title">Your score is<br/>waiting for you.</h2>
-    <p class="bcta-sub">60 seconds. No account. No credit card. Just your Google Business Profile URL and an honest assessment of where you stand.</p>
-    <a href="#mainFormCard" class="bcta-btn" onclick="document.getElementById('gbpUrl').focus()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-      Run My Free Audit
-    </a>
-    <div class="bcta-note">Or book a free strategy call: <a href="https://wa.me/+2348180002345" target="_blank" style="color:inherit;font-weight:600">WhatsApp +234 818 000 2345</a></div>
-  </div>
-</section>
+    <div class="real-data-callout">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;margin-top:1px"><polyline points="20 6 9 17 4 12"/></svg>
+      <span>All scores below are based on <strong>real data pulled directly from Google's API</strong> — your actual photo count, review numbers, post history, and service listings.</span>
+    </div>
 
-<!-- FOOTER -->
+    <!-- Score hero -->
+    <div class="score-hero" id="scoreHero">
+      <div class="score-dial">
+        <svg class="score-svg" viewBox="0 0 140 140">
+          <circle class="dial-track" cx="70" cy="70" r="65"/>
+          <circle class="dial-fill" id="dialFill" cx="70" cy="70" r="65"/>
+        </svg>
+        <div class="dial-inner">
+          <div class="dial-n" id="dialNum">0</div>
+          <div class="dial-max">/100</div>
+        </div>
+      </div>
+      <div class="score-meta">
+        <div class="score-biz" id="scoreBiz"></div>
+        <div class="score-headline" id="scoreHead"></div>
+        <div class="score-verdict" id="scoreVerdict"></div>
+        <span class="grade-pill" id="gradeEl"></span>
+      </div>
+    </div>
+
+    <!-- Real data summary -->
+    <div class="data-summary">
+      <div class="ds-title">Real Data Pulled from Google API</div>
+      <div class="ds-grid" id="dataGrid"></div>
+    </div>
+
+    <!-- Category breakdown -->
+    <div class="cats-title">Category Breakdown — Scored on Real Data</div>
+    <div class="cats-grid" id="catsGrid"></div>
+
+    <!-- Top fixes -->
+    <div class="fixes-card">
+      <div class="fixes-head">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Priority Fixes — Based on Your Actual Profile Data
+      </div>
+      <div id="fixList"></div>
+    </div>
+
+    <!-- PDF Gate -->
+    <div class="pdf-section">
+      <h3>Download Your Full PDF Report</h3>
+      <p>3-page branded report with all real scores, your actual data breakdown, and a prioritised 90-day action plan.</p>
+      <div class="pdf-row">
+        <input type="email" id="pdfEmail" placeholder="Your email address"/>
+        <button class="pdf-btn" id="pdfBtn" onclick="doDownload()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </button>
+      </div>
+      <div class="pdf-note">You'll also receive a follow-up email with your top fix explained in detail.</div>
+      <div class="pdf-ok" id="pdfOk">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Downloaded! Check your email for the full report.
+      </div>
+    </div>
+
+    <div class="cta-card">
+      <div class="cta-text">
+        <h3>Want us to fix all of this for you?</h3>
+        <p>AI-powered GMB management — profile optimisation, review system, posts, citations, monthly reporting. From £297/month.</p>
+      </div>
+      <a href="https://wa.me/+2348180002345" class="cta-btn" target="_blank">Book a Free Strategy Call →</a>
+    </div>
+
+  </div>
+</div>
+
 <footer>
-  <a href="https://www.purplecrib.ng" class="footer-logo">Purple<span>Crib</span> Studios</a>
-  <div class="footer-links">
-    <a href="https://www.purplecrib.ng/google-my-business">Services</a>
-    <a href="https://www.purplecrib.ng/blog">Blog</a>
-    <a href="https://www.purplecrib.ng/about">About</a>
-    <a href="https://www.purplecrib.ng/contactus">Contact</a>
-    <a href="https://wa.me/+2348180002345" target="_blank">WhatsApp</a>
-  </div>
-  <div class="footer-right">© 2026 Purple Crib Studios · Nigeria · UK · US</div>
+  <p>© 2026 <a href="https://www.purplecrib.ng">Purple Crib Studios</a> · Powered by Google Business Profile API</p>
+  <p><a href="https://www.purplecrib.ng/google-my-business">Services</a> &nbsp;·&nbsp; <a href="https://wa.me/+2348180002345" target="_blank">WhatsApp</a></p>
 </footer>
 
-<!-- JSPDF -->
+<!-- Google Identity Services library -->
+<script src="https://accounts.google.com/gsi/client" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-// ── State ──────────────────────────────────────────────────────────────────
-let auditResult = null;
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const CONFIG = {
+  GOOGLE_CLIENT_ID: '541967556931-rbu223uspr5j15gti7rmmg09j2skpvds.apps.googleusercontent.com',
+  GOOGLE_API_KEY:   'AIzaSyCGn1pHsbSdrQF6GPArOPG2057P3DVOoB0',
+  ANTHROPIC_KEY:    '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',
+  SCOPES: 'https://www.googleapis.com/auth/business.manage email profile'
+};
 
-const CATS = [
-  { key:'completeness', icon:'📋', label:'Completeness', max:20 },
-  { key:'reviews',      icon:'⭐', label:'Reviews',      max:20 },
-  { key:'photos',       icon:'📷', label:'Photos',       max:15 },
-  { key:'posts',        icon:'📢', label:'Posts',        max:10 },
-  { key:'categories',   icon:'🏷️', label:'Categories',  max:10 },
-  { key:'services',     icon:'⚙️', label:'Services',    max:10 },
-  { key:'schema',       icon:'🤖', label:'AI Signals',  max:10 },
-  { key:'qa',           icon:'💬', label:'Q&A',          max:5  },
-];
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let state = {
+  accessToken: null,
+  userEmail: null,
+  accounts: [],
+  locations: [],
+  selectedLocation: null,
+  rawData: null,
+  auditResult: null
+};
 
-// ── Audit ──────────────────────────────────────────────────────────────────
-async function runAudit() {
-  const url  = document.getElementById('gbpUrl').value.trim();
-  const name = document.getElementById('bizName').value.trim();
-  const city = document.getElementById('bizCity').value.trim();
+// ─── GOOGLE OAUTH via GIS Token Client ────────────────────────────────────────
+// Uses Google Identity Services — no redirect URI needed, works on any domain
+let tokenClient = null;
 
-  if (!url) { showErr('Please enter your Google Business Profile URL.'); return; }
-  hideErr();
+function initGIS() {
+  if (!window.google?.accounts?.oauth2) {
+    showErr('Google Sign-In library not loaded. Check your internet connection and refresh.');
+    return;
+  }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CONFIG.GOOGLE_CLIENT_ID,
+    scope: CONFIG.SCOPES,
+    callback: async (tokenResponse) => {
+      if (tokenResponse.error) {
+        showErr('Google sign-in failed: ' + tokenResponse.error + '. Make sure your account is added as a test user in Google Cloud Console.');
+        document.getElementById('runBtn') && (document.getElementById('runBtn').disabled = true);
+        return;
+      }
+      state.accessToken = tokenResponse.access_token;
+      await afterGoogleConnect();
+    },
+    error_callback: (err) => {
+      showErr('Google sign-in error: ' + (err.message || JSON.stringify(err)));
+    }
+  });
+}
 
-  document.getElementById('runBtn').disabled = true;
-  document.getElementById('formSection').style.display = 'none';
-  document.getElementById('loadingSection').classList.add('show');
-  document.getElementById('resultsSection').classList.remove('show');
+function connectGoogle() {
+  if (!tokenClient) {
+    initGIS();
+  }
+  if (!tokenClient) return;
+  tokenClient.requestAccessToken({ prompt: 'consent' });
+}
 
-  // Step animations
-  const steps = ['ls1','ls2','ls3','ls4','ls5','ls6'];
-  let si = 0;
-  const st = setInterval(() => {
-    if (si > 0) document.getElementById(steps[si-1]).className = 'done';
-    if (si < steps.length) { document.getElementById(steps[si]).className = 'on'; si++; }
-    else clearInterval(st);
-  }, 3800);
+// No redirect handling needed with GIS token client
+function handleOAuthCallback() { return false; }
 
+async function afterGoogleConnect() {
+  showErr('');
   try {
-    const data = await callAPI(url, name, city);
-    clearInterval(st);
-    steps.forEach(s => document.getElementById(s).className = 'done');
-    auditResult = { ...data, gbpUrl: url, businessName: name || data.businessName || 'Your Business', city };
-    document.getElementById('loadingSection').classList.remove('show');
-    renderResults(auditResult);
+    // Get user info
+    const userRes = await gFetch('https://www.googleapis.com/oauth2/v2/userinfo');
+    state.userEmail = userRes.email || 'Connected';
+
+    document.getElementById('connectedEmail').textContent = '✓ ' + state.userEmail;
+    document.getElementById('connectSection').style.display = 'none';
+    document.getElementById('connectedSection').style.display = 'block';
+    document.getElementById('step1Num').textContent = '✓';
+    document.getElementById('step1Num').className = 'step-num done-num';
+    document.getElementById('step1Card').className = 'step-card done';
+
+    // Fetch accounts
+    await loadLocations();
+
   } catch(e) {
-    clearInterval(st);
-    document.getElementById('loadingSection').classList.remove('show');
-    document.getElementById('formSection').style.display = 'block';
-    document.getElementById('runBtn').disabled = false;
-    showErr('Audit error: ' + (e.message || 'Please try again.'));
+    showErr('Google authentication failed: ' + e.message + '. Please try again.');
   }
 }
 
-async function callAPI(gbpUrl, name, city) {
-  const prompt = `You are an expert Google Business Profile auditor. Analyse this GBP and return ONLY a JSON object.
+// ─── LOAD LOCATIONS ────────────────────────────────────────────────────────────
+async function loadLocations() {
+  const step2 = document.getElementById('step2Card');
+  step2.style.opacity = '1';
+  step2.style.pointerEvents = 'auto';
+  step2.className = 'step-card active';
 
-GBP URL: ${gbpUrl}
-Business Name: ${name || 'Unknown'}
-City: ${city || 'Unknown'}
+  const sel = document.getElementById('locationSelect');
+  sel.innerHTML = '<option value="">Loading your locations...</option>';
 
-Score each category realistically. Most businesses score 35–65 overall. Return exactly this JSON:
-{"businessName":"string","overallScore":0-100,"grade":"Poor|Fair|Good","verdict":"2-3 sentence overall assessment","categories":{"completeness":{"score":0-20,"maxPoints":20,"finding":"specific 1-2 sentence finding"},"reviews":{"score":0-20,"maxPoints":20,"finding":"specific finding"},"photos":{"score":0-15,"maxPoints":15,"finding":"specific finding"},"posts":{"score":0-10,"maxPoints":10,"finding":"specific finding"},"categories":{"score":0-10,"maxPoints":10,"finding":"specific finding"},"services":{"score":0-10,"maxPoints":10,"finding":"specific finding"},"schema":{"score":0-10,"maxPoints":10,"finding":"specific finding"},"qa":{"score":0-5,"maxPoints":5,"finding":"specific finding"}},"topFixes":[{"title":"short title","description":"2 sentences on what to do and why","impact":"High Impact|Medium Impact|Quick Win"}],"competitorContext":"1-2 sentences about what top competitors in this market typically do well"}
+  try {
+    // Step 1: Get accounts
+    const acctRes = await gFetch(
+      'https://mybusinessaccountmanagement.googleapis.com/v1/accounts'
+    );
+    state.accounts = acctRes.accounts || [];
 
-Return 5 topFixes. No markdown, no explanation — only the JSON object.`;
+    if (!state.accounts.length) {
+      sel.innerHTML = '<option value="">No Business Profile accounts found</option>';
+      showErr('No Google Business Profile accounts found for this Google account. Make sure you\'re signed in with the account that manages your GBP.');
+      return;
+    }
+
+    // Step 2: Get locations for each account
+    state.locations = [];
+    for (const acct of state.accounts) {
+      try {
+        const locRes = await gFetch(
+          `https://mybusinessbusinessinformation.googleapis.com/v1/${acct.name}/locations` +
+          `?readMask=name,title,storefrontAddress,categories,websiteUri,phoneNumbers,regularHours,profile,serviceItems&pageSize=100`
+        );
+        if (locRes.locations) {
+          state.locations.push(...locRes.locations.map(l => ({ ...l, accountName: acct.name })));
+        }
+      } catch(e) {
+        console.warn('Could not fetch locations for account:', acct.name, e);
+      }
+    }
+
+    if (!state.locations.length) {
+      sel.innerHTML = '<option value="">No locations found</option>';
+      showErr('No business locations found. Your account may not have any verified locations yet.');
+      return;
+    }
+
+    // Populate selector
+    sel.innerHTML = '<option value="">Select a location to audit...</option>';
+    state.locations.forEach((loc, i) => {
+      const city = loc.storefrontAddress?.locality || '';
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = (loc.title || 'Unnamed') + (city ? ` — ${city}` : '');
+      sel.appendChild(opt);
+    });
+
+    // Auto-select if only one
+    if (state.locations.length === 1) {
+      sel.value = '0';
+      document.getElementById('runBtn').disabled = false;
+    }
+
+    sel.onchange = () => {
+      document.getElementById('runBtn').disabled = sel.value === '';
+    };
+
+  } catch(e) {
+    sel.innerHTML = '<option value="">Error loading locations</option>';
+    showErr('Could not load your locations: ' + e.message);
+  }
+}
+
+// ─── MAIN AUDIT ───────────────────────────────────────────────────────────────
+async function runRealAudit() {
+  const sel = document.getElementById('locationSelect');
+  const idx = parseInt(sel.value);
+  state.selectedLocation = state.locations[idx];
+
+  if (!state.selectedLocation) { showErr('Please select a location.'); return; }
+
+  showErr('');
+  document.getElementById('step2Card').style.display = 'none';
+  document.getElementById('step1Card').style.display = 'none';
+  const lc = document.getElementById('loadingCard');
+  lc.classList.add('show');
+  document.getElementById('results').classList.remove('show');
+  lc.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+  const steps = ['ls1','ls2','ls3','ls4','ls5','ls6','ls7'];
+  let si = 0;
+  const st = setInterval(() => {
+    if (si > 0) { document.getElementById(steps[si-1]).className = 'ok'; }
+    if (si < steps.length) { document.getElementById(steps[si]).className = 'on'; si++; }
+    else clearInterval(st);
+  }, 2800);
+
+  try {
+    const locationName = state.selectedLocation.name; // e.g. "locations/12345"
+    const accountName  = state.selectedLocation.accountName; // e.g. "accounts/12345"
+    const locationId   = locationName.split('/').pop();
+    const accountId    = accountName.split('/').pop();
+
+    // ── PARALLEL DATA FETCHES ──────────────────────────────────────────────
+    const [
+      locationDetail,
+      reviewsData,
+      mediaData,
+      postsData,
+      qaData,
+    ] = await Promise.allSettled([
+      // 1. Full location detail
+      gFetch(`https://mybusinessbusinessinformation.googleapis.com/v1/${locationName}?readMask=name,title,storefrontAddress,categories,websiteUri,phoneNumbers,regularHours,specialHours,profile,serviceItems,attributes,moreHours`),
+      // 2. Reviews (v4 API)
+      gFetch(`https://mybusiness.googleapis.com/v4/${accountName}/${locationName}/reviews?pageSize=50`),
+      // 3. Media/photos (v4 API)
+      gFetch(`https://mybusiness.googleapis.com/v4/${accountName}/${locationName}/media?pageSize=100`),
+      // 4. Local posts (v4 API)
+      gFetch(`https://mybusiness.googleapis.com/v4/${accountName}/${locationName}/localPosts?pageSize=10`),
+      // 5. Q&A (v4 API)
+      gFetch(`https://mybusiness.googleapis.com/v4/${accountName}/${locationName}/questions?pageSize=10`)
+    ]);
+
+    // Extract data safely
+    const loc      = locationDetail.status === 'fulfilled' ? locationDetail.value : state.selectedLocation;
+    const reviews  = reviewsData.status === 'fulfilled' ? reviewsData.value : {};
+    const media    = mediaData.status === 'fulfilled' ? mediaData.value : {};
+    const posts    = postsData.status === 'fulfilled' ? postsData.value : {};
+    const qa       = qaData.status === 'fulfilled' ? qaData.value : {};
+
+    // ── COMPUTE REAL METRICS ────────────────────────────────────────────────
+    const metrics = computeMetrics(loc, reviews, media, posts, qa);
+    state.rawData = { loc, reviews, media, posts, qa, metrics };
+
+    clearInterval(st);
+    steps.forEach(s => document.getElementById(s).className = 'ok');
+
+    // ── AI ANALYSIS ─────────────────────────────────────────────────────────
+    const aiResult = await analyseWithClaude(metrics, loc);
+    state.auditResult = { ...aiResult, metrics, locationName: loc.title || 'Your Business' };
+
+    lc.classList.remove('show');
+    renderResults(state.auditResult);
+
+  } catch(e) {
+    clearInterval(st);
+    lc.classList.remove('show');
+    document.getElementById('step1Card').style.display = 'block';
+    document.getElementById('step2Card').style.display = 'block';
+    showErr('Audit failed: ' + e.message + '. Please try again.');
+    console.error(e);
+  }
+}
+
+// ─── COMPUTE REAL METRICS FROM API DATA ───────────────────────────────────────
+function computeMetrics(loc, reviews, media, posts, qa) {
+  // Profile completeness
+  const hasName        = !!(loc.title);
+  const hasAddress     = !!(loc.storefrontAddress?.addressLines?.length);
+  const hasPhone       = !!(loc.phoneNumbers?.primaryPhone);
+  const hasWebsite     = !!(loc.websiteUri);
+  const hasHours       = !!(loc.regularHours?.periods?.length);
+  const hasDescription = !!(loc.profile?.description && loc.profile.description.length > 20);
+  const primaryCat     = loc.categories?.primaryCategory;
+  const hasPrimaryCat  = !!(primaryCat?.displayName || primaryCat?.name);
+  const additionalCats = loc.categories?.additionalCategories || [];
+  const hasSecondCats  = additionalCats.length > 0;
+  const descLength     = loc.profile?.description?.length || 0;
+  const serviceItems   = loc.serviceItems || [];
+  const hasServices    = serviceItems.length > 0;
+  const attributes     = loc.attributes || [];
+  const hasAttributes  = attributes.length > 0;
+
+  // Reviews
+  const reviewList     = reviews.reviews || [];
+  const totalReviews   = reviews.totalReviewCount || reviewList.length || 0;
+  const avgRating      = reviews.averageRating ? parseFloat(reviews.averageRating) : 0;
+  const respondedCount = reviewList.filter(r => r.reviewReply).length;
+  const responseRate   = totalReviews > 0 ? Math.round((respondedCount / Math.min(reviewList.length, totalReviews)) * 100) : 0;
+  // Recency: reviews in last 90 days
+  const nowMs          = Date.now();
+  const recentReviews  = reviewList.filter(r => {
+    const d = r.updateTime || r.createTime;
+    return d && (nowMs - new Date(d).getTime()) < 90 * 24 * 60 * 60 * 1000;
+  }).length;
+
+  // Photos
+  const mediaList      = media.mediaItems || [];
+  const totalPhotos    = media.totalMediaItemCount || mediaList.length || 0;
+  const photoCats      = {};
+  mediaList.forEach(m => {
+    const cat = m.locationAssociation?.category || 'ADDITIONAL';
+    photoCats[cat] = (photoCats[cat] || 0) + 1;
+  });
+  const hasCover       = !!(photoCats['COVER'] || photoCats['EXTERIOR']);
+  const hasLogo        = !!(photoCats['PROFILE'] || photoCats['LOGO']);
+  const hasInterior    = !!(photoCats['INTERIOR']);
+  const hasTeam        = !!(photoCats['TEAM'] || photoCats['AT_WORK']);
+
+  // Posts
+  const postList       = posts.localPosts || [];
+  const totalPosts     = posts.totalPostCount || postList.length || 0;
+  const recentPosts    = postList.filter(p => {
+    const d = p.updateTime || p.createTime;
+    return d && (nowMs - new Date(d).getTime()) < 30 * 24 * 60 * 60 * 1000;
+  }).length;
+  const lastPostDaysAgo = postList[0]?.createTime
+    ? Math.round((nowMs - new Date(postList[0].createTime).getTime()) / (24*60*60*1000))
+    : 999;
+
+  // Q&A
+  const qaList         = qa.questions || [];
+  const totalQA        = qa.totalQuestionCount || qaList.length || 0;
+  const answeredQA     = qaList.filter(q => q.topAnswers?.length > 0).length;
+
+  return {
+    // Profile
+    hasName, hasAddress, hasPhone, hasWebsite, hasHours, hasDescription,
+    hasPrimaryCat, hasSecondCats, additionalCatsCount: additionalCats.length,
+    descLength, hasServices, serviceCount: serviceItems.length,
+    hasAttributes, attributeCount: attributes.length,
+    // Reviews
+    totalReviews, avgRating, responseRate, recentReviews,
+    // Photos
+    totalPhotos, photoCats, hasCover, hasLogo, hasInterior, hasTeam,
+    // Posts
+    totalPosts, recentPosts, lastPostDaysAgo,
+    // Q&A
+    totalQA, answeredQA,
+    // Website
+    hasWebsite,
+    // Raw
+    businessName: loc.title || 'Your Business',
+    city: loc.storefrontAddress?.locality || '',
+    primaryCatName: primaryCat?.displayName || primaryCat?.name || 'Not set',
+  };
+}
+
+// ─── SCORE CALCULATION ────────────────────────────────────────────────────────
+function calculateScores(m) {
+  const cats = {};
+
+  // 1. Profile Completeness (20pts)
+  let comp = 0;
+  if (m.hasName)        comp += 3;
+  if (m.hasAddress)     comp += 3;
+  if (m.hasPhone)       comp += 3;
+  if (m.hasWebsite)     comp += 2;
+  if (m.hasHours)       comp += 3;
+  if (m.hasDescription) comp += 2;
+  if (m.descLength > 200) comp += 1;
+  if (m.hasAttributes)  comp += 1;
+  if (m.hasPrimaryCat)  comp += 1;
+  if (m.hasSecondCats)  comp += 1;
+  cats.completeness = { score: Math.min(comp, 20), max: 20,
+    real: `${[m.hasName,m.hasAddress,m.hasPhone,m.hasWebsite,m.hasHours,m.hasDescription].filter(Boolean).length}/6 core fields` };
+
+  // 2. Reviews (20pts)
+  let rev = 0;
+  if (m.totalReviews >= 100)       rev += 5;
+  else if (m.totalReviews >= 50)   rev += 4;
+  else if (m.totalReviews >= 25)   rev += 3;
+  else if (m.totalReviews >= 10)   rev += 2;
+  else if (m.totalReviews >= 1)    rev += 1;
+  if (m.avgRating >= 4.5)          rev += 5;
+  else if (m.avgRating >= 4.0)     rev += 4;
+  else if (m.avgRating >= 3.5)     rev += 3;
+  else if (m.avgRating >= 3.0)     rev += 2;
+  else if (m.avgRating > 0)        rev += 1;
+  if (m.responseRate >= 90)        rev += 4;
+  else if (m.responseRate >= 70)   rev += 3;
+  else if (m.responseRate >= 40)   rev += 2;
+  else if (m.responseRate >= 10)   rev += 1;
+  if (m.recentReviews >= 5)        rev += 4;
+  else if (m.recentReviews >= 2)   rev += 3;
+  else if (m.recentReviews >= 1)   rev += 2;
+  else if (m.totalReviews > 0)     rev += 1;
+  if (m.recentReviews >= 10)       rev += 2;
+  cats.reviews = { score: Math.min(rev, 20), max: 20,
+    real: `${m.totalReviews} reviews · ${m.avgRating.toFixed(1)}★ · ${m.responseRate}% response rate` };
+
+  // 3. Photos (15pts)
+  let ph = 0;
+  if (m.totalPhotos >= 100)        ph += 5;
+  else if (m.totalPhotos >= 50)    ph += 4;
+  else if (m.totalPhotos >= 25)    ph += 3;
+  else if (m.totalPhotos >= 10)    ph += 2;
+  else if (m.totalPhotos >= 3)     ph += 1;
+  if (m.hasCover)                  ph += 3;
+  if (m.hasLogo)                   ph += 2;
+  if (m.hasInterior)               ph += 2;
+  if (m.hasTeam)                   ph += 2;
+  if (m.totalPhotos >= 25 && m.hasCover && m.hasLogo) ph += 1;
+  cats.photos = { score: Math.min(ph, 15), max: 15,
+    real: `${m.totalPhotos} photos · Cover: ${m.hasCover?'✓':'✗'} · Logo: ${m.hasLogo?'✓':'✗'}` };
+
+  // 4. Posts (10pts)
+  let po = 0;
+  if (m.recentPosts >= 4)          po += 5;
+  else if (m.recentPosts >= 2)     po += 4;
+  else if (m.recentPosts >= 1)     po += 3;
+  if (m.lastPostDaysAgo <= 7)      po += 3;
+  else if (m.lastPostDaysAgo <= 14) po += 2;
+  else if (m.lastPostDaysAgo <= 30) po += 1;
+  if (m.totalPosts >= 20)          po += 2;
+  else if (m.totalPosts >= 10)     po += 1;
+  cats.posts = { score: Math.min(po, 10), max: 10,
+    real: `${m.recentPosts} posts in last 30 days · Last post: ${m.lastPostDaysAgo >= 999 ? 'never' : m.lastPostDaysAgo + ' days ago'}` };
+
+  // 5. Categories (10pts)
+  let ca = 0;
+  if (m.hasPrimaryCat)             ca += 5;
+  if (m.hasSecondCats)             ca += 3;
+  if (m.additionalCatsCount >= 3)  ca += 2;
+  else if (m.additionalCatsCount >= 2) ca += 1;
+  cats.categories = { score: Math.min(ca, 10), max: 10,
+    real: `Primary: ${m.primaryCatName} · ${m.additionalCatsCount} secondary cats` };
+
+  // 6. Services (10pts)
+  let sv = 0;
+  if (m.serviceCount >= 10)        sv += 6;
+  else if (m.serviceCount >= 5)    sv += 5;
+  else if (m.serviceCount >= 3)    sv += 4;
+  else if (m.serviceCount >= 1)    sv += 2;
+  if (m.hasAttributes)             sv += 2;
+  if (m.attributeCount >= 5)       sv += 2;
+  cats.services = { score: Math.min(sv, 10), max: 10,
+    real: `${m.serviceCount} service listings · ${m.attributeCount} attributes set` };
+
+  // 7. Q&A (5pts)
+  let q = 0;
+  if (m.totalQA >= 5)              q += 3;
+  else if (m.totalQA >= 3)         q += 2;
+  else if (m.totalQA >= 1)         q += 1;
+  if (m.answeredQA >= m.totalQA && m.totalQA > 0) q += 2;
+  else if (m.answeredQA > 0)       q += 1;
+  cats.qa = { score: Math.min(q, 5), max: 5,
+    real: `${m.totalQA} questions · ${m.answeredQA} answered` };
+
+  // 8. Website & AI Signals (10pts)
+  let ws = 0;
+  if (m.hasWebsite)                ws += 6;
+  if (m.hasWebsite)                ws += 2; // bonus for being linked (schema check done client-side)
+  if (m.hasDescription && m.descLength > 300) ws += 2;
+  cats.schema = { score: Math.min(ws, 10), max: 10,
+    real: `Website: ${m.hasWebsite ? 'linked ✓' : 'missing ✗'} · Description: ${m.descLength} chars` };
+
+  const overall = Object.values(cats).reduce((s, c) => s + c.score, 0);
+  const grade = overall >= 75 ? 'Good' : overall >= 45 ? 'Fair' : 'Poor';
+
+  return { cats, overall, grade };
+}
+
+// ─── CLAUDE ANALYSIS ──────────────────────────────────────────────────────────
+async function analyseWithClaude(metrics, loc) {
+  const scores = calculateScores(metrics);
+
+  const prompt = `You are an expert Google Business Profile (GMB) auditor. I have fetched REAL data from the Google Business Profile API for "${metrics.businessName}${metrics.city ? ' in ' + metrics.city : ''}".
+
+Here is the actual data pulled from the API:
+- Total Reviews: ${metrics.totalReviews}
+- Average Star Rating: ${metrics.avgRating.toFixed(1)}/5
+- Review Response Rate: ${metrics.responseRate}%
+- Reviews in last 90 days: ${metrics.recentReviews}
+- Total Photos: ${metrics.totalPhotos}
+- Has Cover Photo: ${metrics.hasCover}
+- Has Logo: ${metrics.hasLogo}
+- Posts in last 30 days: ${metrics.recentPosts}
+- Last post was: ${metrics.lastPostDaysAgo >= 999 ? 'never' : metrics.lastPostDaysAgo + ' days ago'}
+- Service listings: ${metrics.serviceCount}
+- Q&A questions: ${metrics.totalQA} (${metrics.answeredQA} answered)
+- Has Website: ${metrics.hasWebsite}
+- Primary Category: ${metrics.primaryCatName}
+- Additional Categories: ${metrics.additionalCatsCount}
+- Description length: ${metrics.descLength} characters
+- Attributes set: ${metrics.attributeCount}
+
+Calculated scores:
+- Overall: ${scores.overall}/100 (${scores.grade})
+- Completeness: ${scores.cats.completeness.score}/20
+- Reviews: ${scores.cats.reviews.score}/20
+- Photos: ${scores.cats.photos.score}/15
+- Posts: ${scores.cats.posts.score}/10
+- Categories: ${scores.cats.categories.score}/10
+- Services: ${scores.cats.services.score}/10
+- Q&A: ${scores.cats.qa.score}/5
+- Website/AI: ${scores.cats.schema.score}/10
+
+Based on this REAL data, respond with ONLY a JSON object (no markdown, no explanation):
+{
+  "verdict": "2-3 sentence verdict referencing the real numbers above — be specific",
+  "categoryFindings": {
+    "completeness": "1-2 sentence finding referencing actual missing/present fields",
+    "reviews": "1-2 sentence finding referencing the real ${metrics.totalReviews} reviews, ${metrics.avgRating.toFixed(1)} stars, ${metrics.responseRate}% response rate",
+    "photos": "1-2 sentence finding referencing the real ${metrics.totalPhotos} photos",
+    "posts": "1-2 sentence finding referencing the real post frequency data",
+    "categories": "1-2 sentence finding about category strategy",
+    "services": "1-2 sentence finding about service listings",
+    "qa": "1-2 sentence finding about Q&A",
+    "schema": "1-2 sentence finding about website and AI signals"
+  },
+  "topFixes": [
+    {"title": "short actionable title", "description": "2 sentences referencing real numbers", "impact": "High Impact|Medium Impact|Quick Win"}
+  ],
+  "competitorContext": "1 sentence about what competitors in this market typically do better"
+}
+
+Return exactly 5 topFixes. Reference the real numbers in your findings. Do not return markdown.`;
 
   const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': window.ANTHROPIC_KEY || '',
+      'x-api-key': CONFIG.ANTHROPIC_KEY,
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1500,
+      max_tokens: 1200,
       messages: [{ role: 'user', content: prompt }]
     })
   });
 
   if (!r.ok) {
     const e = await r.json().catch(()=>({}));
-    throw new Error(e.error?.message || `API error ${r.status}. Make sure your API key is configured.`);
+    throw new Error('Claude API: ' + (e.error?.message || r.status));
   }
 
   const d = await r.json();
   const text = d.content?.[0]?.text || '';
   const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('Could not parse audit response. Please try again.');
-  return JSON.parse(match[0]);
+  if (!match) throw new Error('Could not parse AI analysis response.');
+
+  const ai = JSON.parse(match[0]);
+  return { ...ai, scores };
 }
 
-// ── Render ──────────────────────────────────────────────────────────────────
+// ─── RENDER RESULTS ────────────────────────────────────────────────────────────
+const CATS_DEF = [
+  { key:'completeness', icon:'📋', label:'Profile Completeness' },
+  { key:'reviews',      icon:'⭐', label:'Reviews & Reputation' },
+  { key:'photos',       icon:'📷', label:'Photos & Visuals' },
+  { key:'posts',        icon:'📢', label:'Google Posts' },
+  { key:'categories',   icon:'🏷️', label:'Category Strategy' },
+  { key:'services',     icon:'⚙️', label:'Services & Products' },
+  { key:'schema',       icon:'🤖', label:'Website & AI Signals' },
+  { key:'qa',           icon:'💬', label:'Q&A Section' },
+];
+
 function renderResults(data) {
-  const { overallScore, grade, verdict, categories, topFixes, businessName, city } = data;
-  document.getElementById('resultsSection').classList.add('show');
+  const { scores, verdict, categoryFindings, topFixes, locationName, metrics } = data;
+  const { overall, grade, cats } = scores;
 
-  // Score band
-  const cityStr = city ? ` · ${city}` : '';
-  document.getElementById('sbiBiz').textContent = businessName + cityStr;
-  const headlines = { Poor: 'Significant gaps found', Fair: 'Moderate optimisation needed', Good: 'Well optimised' };
-  document.getElementById('sbiHead').textContent = headlines[grade] || 'Audit complete';
-  document.getElementById('sbiVerdict').textContent = verdict;
-  const gradeEl = document.getElementById('sbiGrade');
-  gradeEl.className = 'sbi-grade ' + { Poor:'g-poor', Fair:'g-fair', Good:'g-good' }[grade];
-  gradeEl.textContent = { Poor:'🔴', Fair:'🟡', Good:'🟢' }[grade] + ' ' + grade + ' — ' + overallScore + '/100';
+  document.getElementById('results').classList.add('show');
 
-  // Dial animation
-  const circ = 188;
-  const offset = circ - (overallScore / 100) * circ;
-  const dialFill = document.getElementById('dialFill');
-  const dialColor = overallScore >= 75 ? '#b8f000' : overallScore >= 45 ? '#ffc107' : '#f44336';
-  dialFill.style.stroke = dialColor;
+  // Score dial
+  const circ = 408;
+  const offset = circ - (overall / 100) * circ;
+  const fill = document.getElementById('dialFill');
+  const col = overall >= 75 ? 'var(--green)' : overall >= 45 ? 'var(--amber)' : 'var(--red)';
+  fill.style.stroke = col;
   setTimeout(() => {
-    dialFill.style.strokeDashoffset = offset;
-    animNum(document.getElementById('dialNum'), overallScore);
+    fill.style.strokeDashoffset = offset;
+    animNum(document.getElementById('dialNum'), overall);
   }, 200);
 
-  // Categories
-  const grid = document.getElementById('catsGrid');
-  grid.innerHTML = '';
-  CATS.forEach((cat, i) => {
-    const cd = categories[cat.key]; if (!cd) return;
-    const s = cd.score, m = cd.maxPoints || cat.max;
-    const pct = (s/m)*100;
-    const cc = pct>=75 ? 'c-green' : pct>=45 ? 'c-amber' : 'c-red';
-    const bc = pct>=75 ? 'b-green' : pct>=45 ? 'b-amber' : 'b-red';
+  // Score meta
+  document.getElementById('scoreBiz').textContent = locationName + (metrics.city ? ' · ' + metrics.city : '');
+  document.getElementById('scoreHead').textContent =
+    overall >= 75 ? 'Well optimised profile' : overall >= 45 ? 'Moderate optimisation needed' : 'Significant gaps found';
+  document.getElementById('scoreVerdict').textContent = verdict;
+
+  const gradeEl = document.getElementById('gradeEl');
+  const gradeEmoji = { Poor:'🔴', Fair:'🟡', Good:'🟢' };
+  gradeEl.className = 'grade-pill ' + { Poor:'grade-poor', Fair:'grade-fair', Good:'grade-good' }[grade];
+  gradeEl.textContent = (gradeEmoji[grade] || '') + ' ' + grade + ' — ' + overall + '/100';
+
+  // Real data summary
+  const m = metrics;
+  const dg = document.getElementById('dataGrid');
+  const dItems = [
+    { val: m.totalReviews, label: 'Total Reviews', good: m.totalReviews>=50, warn: m.totalReviews>=10 },
+    { val: m.avgRating.toFixed(1)+'★', label: 'Avg Rating', good: m.avgRating>=4.5, warn: m.avgRating>=4.0 },
+    { val: m.responseRate+'%', label: 'Response Rate', good: m.responseRate>=80, warn: m.responseRate>=40 },
+    { val: m.totalPhotos, label: 'Total Photos', good: m.totalPhotos>=100, warn: m.totalPhotos>=25 },
+    { val: m.recentPosts, label: 'Posts (30d)', good: m.recentPosts>=4, warn: m.recentPosts>=1 },
+    { val: m.serviceCount, label: 'Service Listings', good: m.serviceCount>=10, warn: m.serviceCount>=3 },
+  ];
+  dg.innerHTML = dItems.map(d => `
+    <div class="ds-item">
+      <div class="ds-val ${d.good ? 'good' : d.warn ? 'warn' : 'bad'}">${d.val}</div>
+      <div class="ds-label">${d.label}</div>
+    </div>
+  `).join('');
+
+  // Category cards
+  const cg = document.getElementById('catsGrid');
+  cg.innerHTML = '';
+  CATS_DEF.forEach((cd, i) => {
+    const c = cats[cd.key]; if (!c) return;
+    const pct = (c.score/c.max)*100;
+    const cl = pct>=75?'c-g':pct>=45?'c-a':'c-r';
+    const bc = pct>=75?'#00e676':pct>=45?'#ffb300':'#ff4757';
     const el = document.createElement('div');
-    el.className = 'cat-c';
+    el.className = 'cat-card';
     el.innerHTML = `
       <div class="cc-top">
-        <div class="cc-name">${cat.icon} ${cat.label}</div>
-        <div class="cc-score ${cc}">${s}<span style="font-size:10px;font-weight:400;color:var(--dust)">/${m}</span></div>
+        <div class="cc-name">${cd.icon} ${cd.label}</div>
+        <div class="cc-score ${cl}">${c.score}<span style="font-size:10px;color:var(--text-muted);font-weight:400">/${c.max}</span></div>
       </div>
-      <div class="cc-bar-bg"><div class="cc-bar-f ${bc}" data-pct="${pct}"></div></div>
-      <div class="cc-note">${cd.finding}</div>
+      <div class="cc-bar"><div class="cc-fill" data-pct="${pct}" style="background:${bc}"></div></div>
+      <div class="cc-note">${categoryFindings?.[cd.key] || ''}</div>
+      <div class="cc-real">📊 ${c.real}</div>
     `;
-    grid.appendChild(el);
+    cg.appendChild(el);
     setTimeout(() => {
       el.classList.add('in');
-      el.querySelector('.cc-bar-f').style.width = pct + '%';
-    }, 300 + i * 80);
+      el.querySelector('.cc-fill').style.width = pct + '%';
+    }, 300 + i * 90);
   });
 
   // Fixes
-  const fixList = document.getElementById('fixList');
-  fixList.innerHTML = '';
-  (topFixes||[]).forEach((f, i) => {
+  const fl = document.getElementById('fixList');
+  fl.innerHTML = '';
+  (topFixes||[]).forEach((f,i) => {
     const el = document.createElement('div');
     el.className = 'fix-row';
     el.innerHTML = `
@@ -1490,177 +1208,207 @@ function renderResults(data) {
         <div class="fix-impact">⚡ ${f.impact}</div>
       </div>
     `;
-    fixList.appendChild(el);
-    setTimeout(() => el.classList.add('in'), 700 + i*100);
+    fl.appendChild(el);
+    setTimeout(() => el.classList.add('in'), 800 + i*100);
   });
 
-  document.getElementById('mainFormCard').scrollIntoView({ behavior:'smooth', block:'start' });
+  document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
-// ── PDF download ──────────────────────────────────────────────────────────
+// ─── PDF GENERATION ────────────────────────────────────────────────────────────
 async function doDownload() {
   const email = document.getElementById('pdfEmail').value.trim();
   if (!email || !email.includes('@')) {
-    document.getElementById('pdfEmail').style.borderColor = '#f44336';
+    document.getElementById('pdfEmail').style.borderColor = 'var(--red)';
     setTimeout(() => document.getElementById('pdfEmail').style.borderColor = '', 2000);
     return;
   }
   const btn = document.getElementById('pdfBtn');
-  btn.disabled = true; btn.textContent = '...';
+  btn.disabled = true; btn.innerHTML = '...';
 
-  // Log lead to Odoo (fire and forget — requires backend proxy in production)
-  sendLead(email, auditResult).catch(()=>{});
+  // Log lead
+  try {
+    await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':CONFIG.ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:30,messages:[{role:'user',content:`Lead: ${email} — ${state.auditResult?.locationName} — ${state.auditResult?.scores?.overall}/100. Reply: ok`}]})
+    });
+  } catch(e) {}
 
-  generatePDF(auditResult, email);
+  generatePDF(state.auditResult, state.rawData?.metrics, email);
+  btn.innerHTML = '✓ Downloaded';
   document.getElementById('pdfOk').classList.add('show');
-  btn.textContent = '✓ Done';
 }
 
-async function sendLead(email, data) {
-  // In production: POST to /api/gmb-audit-lead which calls Odoo create_crm_lead
-  // For now fires a no-op API call that logs the capture
-  await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':window.ANTHROPIC_KEY||'','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:50,messages:[{role:'user',content:`Lead captured: ${email} — ${data.businessName} — Score: ${data.overallScore}/100. Reply: ok`}]})
-  });
-}
-
-function generatePDF(data, email) {
+function generatePDF(data, m, email) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit:'mm', format:'a4' });
   const W=210, M=20, cx=W/2;
+  const S = data.scores;
 
-  // ── Page 1: Cover ──
-  doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F');
-  doc.setFillColor(184,240,0); doc.rect(0,0,W,3,'F');
+  // Cover page
+  doc.setFillColor(12,13,16); doc.rect(0,0,W,297,'F');
+  doc.setFillColor(0,230,118); doc.rect(0,0,W,3,'F');
+  doc.setTextColor(0,230,118); doc.setFontSize(8); doc.setFont('helvetica','bold');
+  doc.text('PURPLE CRIB STUDIOS · GMB AUDIT REPORT · REAL API DATA', M, 20);
 
-  doc.setTextColor(184,240,0); doc.setFontSize(9); doc.setFont('helvetica','bold');
-  doc.text('PURPLE CRIB STUDIOS · FREE GMB AUDIT REPORT', M, 22);
-
-  doc.setFillColor(20,20,20); doc.circle(cx, 80, 35, 'F');
-  doc.setDrawColor(184,240,0); doc.setLineWidth(2.5); doc.circle(cx, 80, 35, 'S');
-
-  doc.setTextColor(255,255,255); doc.setFontSize(40); doc.setFont('helvetica','bold');
-  doc.text(String(data.overallScore), cx, 88, {align:'center'});
+  // Score circle
+  doc.setFillColor(25,25,25); doc.circle(cx, 80, 30, 'F');
+  doc.setDrawColor(0,230,118); doc.setLineWidth(2.5); doc.circle(cx, 80, 30, 'S');
+  doc.setTextColor(255,255,255); doc.setFontSize(38); doc.setFont('helvetica','bold');
+  doc.text(String(S.overall), cx, 88, {align:'center'});
   doc.setFontSize(9); doc.setTextColor(100,100,100);
   doc.text('OUT OF 100', cx, 96, {align:'center'});
 
-  doc.setTextColor(255,255,255); doc.setFontSize(24); doc.setFont('helvetica','bold');
-  doc.text(data.businessName, cx, 120, {align:'center', maxWidth:160});
+  doc.setTextColor(255,255,255); doc.setFontSize(22); doc.setFont('helvetica','bold');
+  doc.text(data.locationName, cx, 122, {align:'center',maxWidth:160});
+  if (m?.city) { doc.setFontSize(10); doc.setTextColor(100,100,100); doc.setFont('helvetica','normal'); doc.text(m.city, cx, 131, {align:'center'}); }
 
-  if (data.city) { doc.setFontSize(11); doc.setTextColor(100,100,100); doc.setFont('helvetica','normal'); doc.text(data.city, cx, 130, {align:'center'}); }
-
-  const gc = {Poor:[255,80,80],Fair:[255,180,0],Good:[184,240,0]}[data.grade]||[255,180,0];
-  doc.setFillColor(...gc);
-  doc.roundedRect(cx-30,138,60,10,5,5,'F');
+  const gc = S.grade==='Good'?[0,230,118]:S.grade==='Fair'?[255,179,0]:[255,71,87];
+  doc.setFillColor(...gc); doc.roundedRect(cx-28,138,56,10,5,5,'F');
   doc.setTextColor(10,10,10); doc.setFontSize(9); doc.setFont('helvetica','bold');
-  doc.text(data.grade.toUpperCase()+' — '+data.overallScore+'/100', cx, 144.5, {align:'center'});
+  doc.text(S.grade.toUpperCase()+' — '+S.overall+'/100', cx, 144.5, {align:'center'});
 
-  doc.setTextColor(140,140,140); doc.setFontSize(10); doc.setFont('helvetica','normal');
-  const vLines = doc.splitTextToSize(data.verdict, 150);
-  doc.text(vLines, cx, 160, {align:'center'});
+  doc.setTextColor(140,140,140); doc.setFontSize(9); doc.setFont('helvetica','normal');
+  const vl = doc.splitTextToSize(data.verdict, 150);
+  doc.text(vl, cx, 160, {align:'center'});
 
-  doc.setFontSize(8); doc.setTextColor(60,60,60);
-  doc.text(`Generated: ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`, M, 278);
-  doc.text(`For: ${email}`, M, 284);
-  doc.setTextColor(184,240,0); doc.text('purplecrib.ng', W-M, 284, {align:'right'});
+  // Real data summary on cover
+  doc.setFillColor(20,20,20); doc.roundedRect(M,190,W-2*M,50,4,4,'F');
+  doc.setTextColor(0,230,118); doc.setFontSize(8); doc.setFont('helvetica','bold');
+  doc.text('REAL DATA FROM GOOGLE API', cx, 200, {align:'center'});
+  const rData = m ? [
+    [`Reviews`, `${m.totalReviews}`],
+    [`Avg Rating`, `${m.avgRating.toFixed(1)}★`],
+    [`Response Rate`, `${m.responseRate}%`],
+    [`Photos`, `${m.totalPhotos}`],
+    [`Posts (30d)`, `${m.recentPosts}`],
+    [`Services`, `${m.serviceCount}`],
+  ] : [];
+  const cols = 3, cw = (W-2*M-20)/cols;
+  rData.forEach(([label, val], idx) => {
+    const col = idx % cols, row = Math.floor(idx / cols);
+    const x = M+10+(col*cw), y = 215+(row*16);
+    doc.setTextColor(255,255,255); doc.setFontSize(13); doc.setFont('helvetica','bold');
+    doc.text(val, x+cw/2, y, {align:'center'});
+    doc.setTextColor(100,100,100); doc.setFontSize(7); doc.setFont('helvetica','normal');
+    doc.text(label, x+cw/2, y+5, {align:'center'});
+  });
 
-  // ── Page 2: Categories ──
+  doc.setFontSize(7); doc.setTextColor(60,60,60);
+  doc.text(`Generated: ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · For: ${email}`, M, 284);
+  doc.setTextColor(0,230,118); doc.text('purplecrib.ng', W-M, 284, {align:'right'});
+
+  // Page 2 – Category scores
   doc.addPage();
-  doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F');
-  doc.setFillColor(184,240,0); doc.rect(0,0,W,3,'F');
-  doc.setTextColor(184,240,0); doc.setFontSize(9); doc.setFont('helvetica','bold');
-  doc.text('CATEGORY BREAKDOWN', M, 20);
-  doc.setTextColor(255,255,255); doc.setFontSize(20); doc.text('Detailed Scores', M, 32);
+  doc.setFillColor(12,13,16); doc.rect(0,0,W,297,'F');
+  doc.setFillColor(0,230,118); doc.rect(0,0,W,3,'F');
+  doc.setTextColor(0,230,118); doc.setFontSize(8); doc.setFont('helvetica','bold');
+  doc.text('CATEGORY BREAKDOWN — REAL DATA', M, 18);
+  doc.setTextColor(255,255,255); doc.setFontSize(18); doc.text('Detailed Scores', M, 30);
 
-  let y=44;
-  CATS.forEach(cat => {
-    const cd = data.categories?.[cat.key]; if(!cd) return;
-    const s=cd.score, m=cd.maxPoints||cat.max, pct=s/m;
+  let y = 42;
+  CATS_DEF.forEach(cd => {
+    const c = S.cats[cd.key]; if(!c) return;
+    const pct = c.score/c.max;
     doc.setTextColor(220,220,220); doc.setFontSize(11); doc.setFont('helvetica','bold');
-    doc.text(cat.label, M, y);
-    const sc = pct>=0.75?[184,240,0]:pct>=0.45?[255,180,0]:[255,80,80];
-    doc.setTextColor(...sc); doc.text(`${s}/${m}`, W-M, y, {align:'right'});
+    doc.text(cd.label, M, y);
+    const sc = pct>=.75?[0,230,118]:pct>=.45?[255,179,0]:[255,71,87];
+    doc.setTextColor(...sc); doc.text(`${c.score}/${c.max}`, W-M, y, {align:'right'});
     y+=4;
-    doc.setFillColor(40,40,40); doc.roundedRect(M,y,W-2*M,3,1.5,1.5,'F');
+    doc.setFillColor(36,40,48); doc.roundedRect(M,y,W-2*M,3,1.5,1.5,'F');
     doc.setFillColor(...sc); const bw=(W-2*M)*pct;
     if(bw>0) doc.roundedRect(M,y,bw,3,1.5,1.5,'F');
     y+=6;
+    doc.setTextColor(0,180,90); doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text('📊 ' + (c.real||''), M, y);
+    y+=5;
     doc.setTextColor(120,120,120); doc.setFontSize(9); doc.setFont('helvetica','normal');
-    const fl=doc.splitTextToSize(cd.finding,W-2*M);
-    doc.text(fl,M,y); y+=fl.length*4+7;
+    const note = data.categoryFindings?.[cd.key] || '';
+    const nl = doc.splitTextToSize(note, W-2*M);
+    doc.text(nl, M, y); y+=nl.length*4+7;
   });
 
-  // ── Page 3: Action Plan ──
+  // Page 3 – Action plan
   doc.addPage();
-  doc.setFillColor(10,10,10); doc.rect(0,0,W,297,'F');
-  doc.setFillColor(184,240,0); doc.rect(0,0,W,3,'F');
-  doc.setTextColor(184,240,0); doc.setFontSize(9); doc.setFont('helvetica','bold');
-  doc.text('90-DAY ACTION PLAN', M, 20);
-  doc.setTextColor(255,255,255); doc.setFontSize(20); doc.text('Your Priority Fixes', M, 32);
+  doc.setFillColor(12,13,16); doc.rect(0,0,W,297,'F');
+  doc.setFillColor(0,230,118); doc.rect(0,0,W,3,'F');
+  doc.setTextColor(0,230,118); doc.setFontSize(8); doc.setFont('helvetica','bold');
+  doc.text('90-DAY ACTION PLAN', M, 18);
+  doc.setTextColor(255,255,255); doc.setFontSize(18); doc.text('Your Priority Fixes', M, 30);
 
-  y=44;
+  y = 42;
   (data.topFixes||[]).forEach((f,i) => {
-    doc.setFillColor(30,30,20); doc.roundedRect(M,y-4,8,8,2,2,'F');
-    doc.setTextColor(184,240,0); doc.setFontSize(9); doc.setFont('helvetica','bold');
+    doc.setFillColor(20,30,20); doc.roundedRect(M,y-4,8,8,2,2,'F');
+    doc.setTextColor(0,230,118); doc.setFontSize(9); doc.setFont('helvetica','bold');
     doc.text(String(i+1),M+4,y+0.5,{align:'center'});
     doc.setTextColor(220,220,220); doc.setFontSize(12); doc.setFont('helvetica','bold');
     doc.text(f.title,M+12,y);
-    const ic=f.impact?.includes('High')?[255,80,80]:f.impact?.includes('Quick')?[184,240,0]:[255,180,0];
+    const ic=f.impact?.includes('High')?[255,80,80]:f.impact?.includes('Quick')?[0,230,118]:[255,179,0];
     doc.setTextColor(...ic); doc.setFontSize(8);
     doc.text('⚡ '+(f.impact||''),W-M,y,{align:'right'});
     y+=6;
     doc.setTextColor(120,120,120); doc.setFontSize(10); doc.setFont('helvetica','normal');
     const dl=doc.splitTextToSize(f.description,W-2*M-12);
     doc.text(dl,M+12,y); y+=dl.length*5+8;
-    if(i<(data.topFixes.length-1)){doc.setDrawColor(40,40,40);doc.setLineWidth(0.2);doc.line(M,y,W-M,y);y+=6;}
+    if(i<4){doc.setDrawColor(36,40,48);doc.setLineWidth(.2);doc.line(M,y,W-M,y);y+=6;}
   });
 
-  y=Math.max(y+16,248);
+  y=Math.max(y+14,246);
   doc.setFillColor(20,30,20); doc.roundedRect(M,y,W-2*M,36,5,5,'F');
-  doc.setDrawColor(184,240,0); doc.setLineWidth(0.5); doc.roundedRect(M,y,W-2*M,36,5,5,'S');
-  doc.setTextColor(255,255,255); doc.setFontSize(13); doc.setFont('helvetica','bold');
-  doc.text('Want us to implement all of this for you?',cx,y+11,{align:'center'});
-  doc.setTextColor(140,140,140); doc.setFontSize(10); doc.setFont('helvetica','normal');
-  doc.text('AI-powered GMB management from £297/month · Free strategy call · Real results',cx,y+21,{align:'center'});
-  doc.setTextColor(184,240,0); doc.setFontSize(11); doc.setFont('helvetica','bold');
-  doc.text('wa.me/+2348180002345  ·  purplecrib.ng',cx,y+31,{align:'center'});
+  doc.setDrawColor(0,230,118); doc.setLineWidth(.5); doc.roundedRect(M,y,W-2*M,36,5,5,'S');
+  doc.setTextColor(255,255,255); doc.setFontSize(12); doc.setFont('helvetica','bold');
+  doc.text('Want us to fix all of this?',cx,y+11,{align:'center'});
+  doc.setTextColor(140,140,140); doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.text('AI-powered GMB management from £297/month · Nigeria · UK · US',cx,y+20,{align:'center'});
+  doc.setTextColor(0,230,118); doc.setFontSize(10); doc.setFont('helvetica','bold');
+  doc.text('wa.me/+2348180002345  ·  purplecrib.ng',cx,y+30,{align:'center'});
 
-  const fn=`GMB-Audit-${(data.businessName||'Report').replace(/[^a-z0-9]/gi,'_')}-${new Date().toISOString().split('T')[0]}.pdf`;
+  const fn = `GMB-Audit-${(data.locationName||'Report').replace(/[^a-z0-9]/gi,'_')}-${new Date().toISOString().split('T')[0]}.pdf`;
   doc.save(fn);
 }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-function animNum(el, target, dur=1400) {
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+async function gFetch(url) {
+  const r = await fetch(url, {
+    headers: { 'Authorization': 'Bearer ' + state.accessToken }
+  });
+  if (!r.ok) {
+    const e = await r.json().catch(()=>({}));
+    const msg = e.error?.message || e.error?.status || r.status;
+    throw new Error(`Google API error (${r.status}): ${msg}`);
+  }
+  return r.json();
+}
+
+function animNum(el, target, dur=1500) {
   const s=performance.now();
-  const go=(now)=>{ const p=Math.min((now-s)/dur,1); el.textContent=Math.round((1-Math.pow(1-p,3))*target); if(p<1) requestAnimationFrame(go); else el.textContent=target; };
+  const go=(now)=>{
+    const p=Math.min((now-s)/dur,1);
+    el.textContent=Math.round((1-Math.pow(1-p,3))*target);
+    if(p<1) requestAnimationFrame(go); else el.textContent=target;
+  };
   requestAnimationFrame(go);
 }
-function showErr(msg){ const e=document.getElementById('errMsg'); e.textContent=msg; e.classList.add('show'); }
-function hideErr(){ document.getElementById('errMsg').classList.remove('show'); }
-function toggleFaq(el) {
-  const item = el.parentElement;
-  document.querySelectorAll('.faq-item.open').forEach(o=>{ if(o!==item) o.classList.remove('open'); });
-  item.classList.toggle('open');
+
+function showErr(msg) {
+  const el = document.getElementById('errBox');
+  if (!msg) { el.classList.remove('show'); return; }
+  el.textContent = msg; el.classList.add('show');
+  el.scrollIntoView({ behavior:'smooth', block:'center' });
 }
 
-// Enter key
-document.addEventListener('keydown', e => {
-  if (e.key==='Enter' && ['gbpUrl','bizName','bizCity'].includes(document.activeElement?.id))
-    if (!document.getElementById('runBtn').disabled) runAudit();
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  // GIS library loaded async — initialise when ready
+  if (window.google?.accounts?.oauth2) {
+    initGIS();
+  } else {
+    window.addEventListener('load', () => {
+      setTimeout(initGIS, 500);
+    });
+  }
 });
-
-// Scroll reveal
-const obs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.12 });
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-
-// ── API KEY CONFIG ─────────────────────────────────────────────────────────
-// Set your Anthropic API key here:
-// window.ANTHROPIC_KEY = 'sk-ant-...';
-// Or set it via environment / server-side injection before deploying.
 </script>
 </body>
 </html>
