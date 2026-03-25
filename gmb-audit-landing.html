@@ -3,421 +3,210 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Free GMB Audit — Real Data from Google | Purple Crib Studios</title>
-<meta name="description" content="Get a real AI-powered Google Business Profile audit. Connect your Google account and get scored on real data — not guesses. Free, instant, accurate."/>
+<title>Free GMB Audit — Real Google Data | Purple Crib Studios</title>
+<meta name="description" content="Real AI-powered Google Business Profile audit. Real data from Google's API, scored out of 100, with AI-generated suggestions to fix every weak point."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<!-- Google Identity Services library -->
 <script src="https://accounts.google.com/gsi/client" async></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-:root {
-  --bg: #0c0d10;
-  --surface: #13151a;
-  --surface2: #1a1d25;
-  --border: #242830;
-  --green: #00e676;
-  --green-dim: rgba(0,230,118,0.12);
-  --green-mid: rgba(0,230,118,0.3);
-  --amber: #ffb300;
-  --red: #ff4757;
-  --text: #e8eaf0;
-  --text-dim: #7a8094;
-  --text-muted: #3d4255;
-  --mono: 'Space Mono', monospace;
-  --sans: 'DM Sans', sans-serif;
+:root{
+  --bg:#0c0d10;--surface:#13151a;--surface2:#1a1d25;--border:#242830;
+  --green:#00e676;--gdim:rgba(0,230,118,.12);--gmid:rgba(0,230,118,.3);
+  --amber:#ffb300;--red:#ff4757;
+  --text:#e8eaf0;--dim:#7a8094;--muted:#3d4255;
+  --mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  min-height: 100vh;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-}
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(0,230,118,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,230,118,0.025) 1px, transparent 1px);
-  background-size: 44px 44px;
-  pointer-events: none; z-index: 0;
-}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,230,118,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,230,118,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0}
 
-/* NAV */
-header {
-  position: relative; z-index: 10;
-  padding: 18px 32px;
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--border);
-  background: rgba(12,13,16,0.92);
-  backdrop-filter: blur(14px);
-}
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-.logo-pulse {
-  width: 9px; height: 9px; background: var(--green); border-radius: 50%;
-  box-shadow: 0 0 10px var(--green);
-  animation: pulse 2.2s ease-in-out infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.8)} }
-.logo-name { font-family: var(--mono); font-size: 12px; color: var(--text); letter-spacing: .06em; }
-.logo-name span { color: var(--green); }
-.nav-cta {
-  font-size: 12px; font-weight: 600; color: var(--text-dim);
-  padding: 8px 18px; border: 1px solid var(--border);
-  border-radius: 6px; text-decoration: none; transition: all .2s;
-}
-.nav-cta:hover { border-color: var(--green); color: var(--green); }
+header{position:relative;z-index:10;padding:18px 32px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:rgba(12,13,16,.92);backdrop-filter:blur(14px)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.pulse{width:9px;height:9px;background:var(--green);border-radius:50%;box-shadow:0 0 10px var(--green);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.logo-n{font-family:var(--mono);font-size:12px;color:var(--text);letter-spacing:.06em}
+.logo-n span{color:var(--green)}
+.nav-a{font-size:12px;font-weight:600;color:var(--dim);padding:8px 18px;border:1px solid var(--border);border-radius:6px;text-decoration:none;transition:all .2s}
+.nav-a:hover{border-color:var(--green);color:var(--green)}
 
-/* HERO */
-.hero {
-  position: relative; z-index: 1;
-  max-width: 720px; margin: 0 auto;
-  padding: 72px 24px 48px;
-  text-align: center;
-}
-.badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--green);
-  padding: 6px 16px; border: 1px solid var(--green-mid);
-  border-radius: 100px; background: var(--green-dim); margin-bottom: 28px;
-}
-.hero h1 {
-  font-size: clamp(30px,5vw,52px); font-weight: 600;
-  line-height: 1.12; letter-spacing: -.02em; margin-bottom: 18px;
-}
-.hero h1 em { font-style: normal; color: var(--green); }
-.hero p {
-  font-size: 16px; font-weight: 300; color: var(--text-dim);
-  line-height: 1.7; max-width: 520px; margin: 0 auto 16px;
-}
-.real-data-note {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 12px; color: var(--green); font-weight: 500;
-  background: var(--green-dim); border: 1px solid var(--green-mid);
-  border-radius: 8px; padding: 8px 16px; margin-bottom: 40px;
-}
+.hero{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:60px 24px 36px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--green);padding:6px 16px;border:1px solid var(--gmid);border-radius:100px;background:var(--gdim);margin-bottom:22px}
+.hero h1{font-size:clamp(26px,5vw,46px);font-weight:600;line-height:1.12;letter-spacing:-.02em;margin-bottom:14px}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero p{font-size:15px;font-weight:300;color:var(--dim);line-height:1.7;max-width:500px;margin:0 auto}
 
-/* MAIN CONTAINER */
-.main { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 0 24px 80px; }
+.main{position:relative;z-index:1;max-width:660px;margin:0 auto;padding:28px 24px 80px}
 
-/* STEP CARDS */
-.step-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
-  margin-bottom: 16px;
-  transition: border-color .3s;
-}
-.step-card.active { border-color: var(--green); }
-.step-card.done { border-color: rgba(0,230,118,.3); opacity: .6; }
-.step-header {
-  display: flex; align-items: center; gap: 14px; margin-bottom: 24px;
-}
-.step-num {
-  width: 32px; height: 32px; border-radius: 10px;
-  background: var(--green); color: #000;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--mono); font-size: 13px; font-weight: 700; flex-shrink: 0;
-}
-.step-num.done-num { background: rgba(0,230,118,.15); color: var(--green); }
-.step-title { font-size: 16px; font-weight: 600; }
-.step-sub { font-size: 13px; color: var(--text-dim); margin-top: 2px; }
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:26px;margin-bottom:14px;transition:border-color .3s}
+.card.active{border-color:var(--green)}
+.card.done{opacity:.45;pointer-events:none}
+.ch{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.sn{width:30px;height:30px;border-radius:9px;background:var(--green);color:#000;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;flex-shrink:0}
+.sn.dn{background:var(--gdim);color:var(--green)}
+.st{font-size:15px;font-weight:600}
+.ss{font-size:12px;color:var(--dim);margin-top:2px}
 
-/* GOOGLE CONNECT BUTTON */
-.google-btn {
-  width: 100%;
-  display: flex; align-items: center; justify-content: center; gap: 12px;
-  padding: 16px 24px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  font-family: var(--sans); font-size: 15px; font-weight: 600;
-  color: var(--text); cursor: pointer;
-  transition: all .25s;
-}
-.google-btn:hover { border-color: #4285f4; box-shadow: 0 0 0 3px rgba(66,133,244,.12); }
-.google-icon { width: 20px; height: 20px; flex-shrink: 0; }
-.google-connected {
-  display: flex; align-items: center; gap: 10px;
-  padding: 14px 18px;
-  background: var(--green-dim); border: 1px solid var(--green-mid);
-  border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--green);
-}
-
-/* LOCATION SELECT */
-.location-select-wrap { margin-top: 0; }
-.location-select-label {
-  font-size: 11px; font-weight: 600; letter-spacing: .08em;
-  text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; display: block;
-}
-.location-select {
-  width: 100%;
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: 10px; padding: 13px 16px;
-  font-family: var(--sans); font-size: 14px; color: var(--text);
-  outline: none; cursor: pointer; transition: border-color .2s;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a8094' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center;
-}
-.location-select:focus { border-color: var(--green); }
-.location-select option { background: var(--surface); }
-
-/* RUN BUTTON */
-.run-btn {
-  width: 100%; margin-top: 16px;
-  padding: 16px;
-  background: var(--green); color: #000;
-  border: none; border-radius: 12px;
-  font-family: var(--sans); font-size: 15px; font-weight: 700;
-  cursor: pointer; transition: all .2s;
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-}
-.run-btn:hover:not(:disabled) {
-  background: #00ff84; transform: translateY(-1px);
-  box-shadow: 0 8px 28px rgba(0,230,118,.3);
-}
-.run-btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:15px;background:var(--bg);border:1px solid var(--border);border-radius:11px;font-family:var(--sans);font-size:14px;font-weight:600;color:var(--text);cursor:pointer;transition:all .25s}
+.gbtn:hover{border-color:#4285f4;box-shadow:0 0 0 3px rgba(66,133,244,.12)}
+.cok{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--gdim);border:1px solid var(--gmid);border-radius:10px;font-size:13px;font-weight:500;color:var(--green)}
+.flbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;display:block}
+.lsel{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:13px 16px;font-family:var(--sans);font-size:14px;color:var(--text);outline:none;cursor:pointer;transition:border-color .2s;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a8094' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.lsel:focus{border-color:var(--green)}
+.rbtn{width:100%;margin-top:14px;padding:15px;background:var(--green);color:#000;border:none;border-radius:11px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+.rbtn:hover:not(:disabled){background:#00ff84;transform:translateY(-1px);box-shadow:0 8px 28px rgba(0,230,118,.3)}
+.rbtn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 
 /* LOADING */
-.loading-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 16px; padding: 48px 32px; text-align: center;
-  display: none;
-}
-.loading-card.show { display: block; }
-.l-ring {
-  width: 56px; height: 56px;
-  border: 2px solid var(--border); border-top-color: var(--green);
-  border-radius: 50%; margin: 0 auto 20px;
-  animation: spin .75s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.l-title { font-size: 16px; font-weight: 600; margin-bottom: 24px; }
-.l-steps { list-style: none; max-width: 340px; margin: 0 auto; text-align: left; }
-.l-steps li {
-  font-size: 13px; color: var(--text-muted);
-  padding: 6px 0; display: flex; align-items: center; gap: 10px;
-  transition: color .4s;
-}
-.l-steps li.on { color: var(--green); font-weight: 500; }
-.l-steps li.ok { color: var(--text-dim); }
-.l-steps li.ok::before { content: '✓ '; color: var(--green); }
-.l-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.loading{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:46px 28px;text-align:center;display:none}
+.loading.show{display:block}
+.lr{width:50px;height:50px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;margin:0 auto 16px;animation:spin .75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lt{font-size:15px;font-weight:600;margin-bottom:20px}
+.ls{list-style:none;max-width:300px;margin:0 auto;text-align:left}
+.ls li{font-size:12px;color:var(--muted);padding:5px 0;display:flex;align-items:center;gap:8px;transition:color .4s}
+.ls li.on{color:var(--green);font-weight:500}
+.ls li.ok{color:var(--dim)}
+.ld{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
 
 /* RESULTS */
-.results { display: none; }
-.results.show { display: block; }
+.results{display:none}
+.results.show{display:block}
 
 /* SCORE HERO */
-.score-hero {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 20px; padding: 40px;
-  display: grid; grid-template-columns: 160px 1fr;
-  gap: 36px; align-items: center;
-  margin-bottom: 20px; position: relative; overflow: hidden;
-}
-.score-hero::after {
-  content: ''; position: absolute;
-  top: -60px; right: -60px; width: 220px; height: 220px;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--green-dim) 0%, transparent 70%);
-  pointer-events: none;
-}
-.score-dial { position: relative; width: 160px; height: 160px; }
-.score-svg { width: 160px; height: 160px; transform: rotate(-90deg); }
-.dial-track { fill: none; stroke: var(--border); stroke-width: 10; }
-.dial-fill {
-  fill: none; stroke-width: 10; stroke-linecap: round;
-  stroke-dasharray: 408; stroke-dashoffset: 408;
-  transition: stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1);
-}
-.dial-inner {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.dial-n {
-  font-family: var(--mono); font-size: 42px; font-weight: 700;
-  color: var(--green); line-height: 1;
-}
-.dial-max { font-size: 11px; color: var(--text-muted); font-family: var(--mono); margin-top: 2px; }
-.score-meta { }
-.score-biz { font-family: var(--mono); font-size: 11px; color: var(--green); letter-spacing: .06em; margin-bottom: 6px; }
-.score-headline { font-size: 22px; font-weight: 600; line-height: 1.2; margin-bottom: 10px; }
-.score-verdict { font-size: 14px; color: var(--text-dim); line-height: 1.65; margin-bottom: 14px; }
-.grade-pill {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 100px;
-}
-.grade-poor { background: rgba(255,71,87,.12); color: var(--red); border: 1px solid rgba(255,71,87,.3); }
-.grade-fair { background: rgba(255,179,0,.12); color: var(--amber); border: 1px solid rgba(255,179,0,.3); }
-.grade-good { background: var(--green-dim); color: var(--green); border: 1px solid var(--green-mid); }
+.sh{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:34px;display:grid;grid-template-columns:148px 1fr;gap:30px;align-items:center;margin-bottom:14px;position:relative;overflow:hidden}
+.sh::after{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,var(--gdim),transparent 70%);pointer-events:none}
+.dial{width:148px;height:148px;position:relative}
+.dsvg{width:148px;height:148px;transform:rotate(-90deg)}
+.dt{fill:none;stroke:var(--border);stroke-width:10}
+.df{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:376;stroke-dashoffset:376;transition:stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1)}
+.di{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.dn2{font-family:var(--mono);font-size:36px;font-weight:700;color:var(--green);line-height:1}
+.dm{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:2px}
+.sb{font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.06em;margin-bottom:5px}
+.shd{font-size:19px;font-weight:600;line-height:1.2;margin-bottom:9px}
+.sv{font-size:13px;color:var(--dim);line-height:1.65;margin-bottom:11px}
+.gp{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 14px;border-radius:100px}
+.g-p{background:rgba(255,71,87,.12);color:var(--red);border:1px solid rgba(255,71,87,.3)}
+.g-f{background:rgba(255,179,0,.12);color:var(--amber);border:1px solid rgba(255,179,0,.3)}
+.g-g{background:var(--gdim);color:var(--green);border:1px solid var(--gmid)}
 
-/* REAL DATA CALLOUT */
-.real-data-callout {
-  background: var(--green-dim); border: 1px solid var(--green-mid);
-  border-radius: 10px; padding: 14px 18px;
-  font-size: 12px; color: var(--green); margin-bottom: 20px;
-  display: flex; align-items: flex-start; gap: 10px; line-height: 1.5;
-}
+/* FREE PREVIEW — score bars */
+.fp{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:14px}
+.slbl{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.bars{display:flex;flex-direction:column;gap:11px}
+.br{display:flex;align-items:center;gap:12px}
+.bl{font-size:12px;font-weight:500;width:138px;flex-shrink:0;display:flex;align-items:center;gap:6px}
+.bt{flex:1;height:6px;background:var(--border);border-radius:10px;overflow:hidden}
+.bf{height:100%;border-radius:10px;width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.bsc{font-family:var(--mono);font-size:12px;font-weight:700;width:34px;text-align:right;flex-shrink:0}
+.cg{color:var(--green)}.ca{color:var(--amber)}.cr{color:var(--red)}
+.bg{background:var(--green)}.ba{background:var(--amber)}.br2{background:var(--red)}
 
-/* DATA SUMMARY */
-.data-summary {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 14px; padding: 20px; margin-bottom: 20px;
-}
-.ds-title {
-  font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--text-muted); margin-bottom: 16px;
-}
-.ds-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.ds-item { text-align: center; }
-.ds-val {
-  font-family: var(--mono); font-size: 24px; font-weight: 700;
-  color: var(--text); line-height: 1; margin-bottom: 4px;
-}
-.ds-val.good { color: var(--green); }
-.ds-val.warn { color: var(--amber); }
-.ds-val.bad { color: var(--red); }
-.ds-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; }
+/* REAL DATA STRIP */
+.rds{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 22px;margin-bottom:14px}
+.rdg{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rdi{text-align:center}
+.rdv{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1;margin-bottom:3px}
+.rdl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 
-/* CATEGORIES */
-.cats-title {
-  font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
-  text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px;
-}
-.cats-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
-  gap: 12px; margin-bottom: 20px;
-}
-.cat-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 13px; padding: 18px;
-  opacity: 0; transform: translateY(10px);
-  transition: opacity .4s, transform .4s, border-color .2s;
-}
-.cat-card.in { opacity: 1; transform: none; }
-.cat-card:hover { border-color: var(--text-muted); }
-.cc-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.cc-name { font-size: 12px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 6px; }
-.cc-score { font-family: var(--mono); font-size: 17px; font-weight: 700; }
-.c-g { color: var(--green); }
-.c-a { color: var(--amber); }
-.c-r { color: var(--red); }
-.cc-bar { height: 3px; background: var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
-.cc-fill { height: 100%; border-radius: 10px; width: 0; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
-.cc-note { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
-.cc-real { font-size: 10px; color: var(--text-muted); margin-top: 6px; font-family: var(--mono); }
+/* PAYWALL */
+.pw{background:var(--surface2);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:14px}
+.pwt{padding:26px;text-align:center;border-bottom:1px solid var(--border)}
+.pwt h3{font-size:17px;font-weight:600;margin-bottom:8px}
+.pwt p{font-size:13px;color:var(--dim);line-height:1.6;max-width:380px;margin:0 auto 14px}
+.pwl{display:flex;align-items:center;gap:8px;justify-content:center;font-size:11px;color:var(--muted)}
 
-/* FIXES */
-.fixes-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 14px; padding: 24px; margin-bottom: 20px;
-}
-.fixes-head {
-  font-size: 13px; font-weight: 600; color: var(--text);
-  display: flex; align-items: center; gap: 8px; margin-bottom: 18px;
-}
-.fix-row {
-  display: flex; gap: 14px; padding: 13px 0;
-  border-bottom: 1px solid var(--border);
-  opacity: 0; transform: translateX(-6px);
-  transition: opacity .4s, transform .4s;
-}
-.fix-row:last-child { border-bottom: none; }
-.fix-row.in { opacity: 1; transform: none; }
-.fix-n {
-  width: 26px; height: 26px; flex-shrink: 0;
-  background: var(--green-dim); border: 1px solid var(--green-mid);
-  border-radius: 8px; display: flex; align-items: center; justify-content: center;
-  font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--green);
-}
-.fix-body h5 { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
-.fix-body p { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
-.fix-impact { font-size: 11px; font-family: var(--mono); color: var(--amber); margin-top: 3px; }
+/* TIERS */
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border)}
+.tier{background:var(--surface);padding:20px 16px;text-align:center;cursor:pointer;transition:background .2s;position:relative}
+.tier:hover{background:#1e2028}
+.tier.pop{background:#1a1f28}
+.pbadge{position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--green);background:var(--gdim);border:1px solid var(--gmid);padding:3px 8px;border-radius:100px}
+.te{font-size:22px;margin-bottom:8px;display:block}
+.tn{font-size:11px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.tp{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--text);margin-bottom:3px}
+.tp span{font-size:13px;color:var(--dim)}
+.td{font-size:11px;color:var(--muted);margin-bottom:13px;line-height:1.4}
+.tbtn{width:100%;padding:10px;border:none;border-radius:9px;font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+.tbg{background:var(--green);color:#000}
+.tbg:hover{background:#00ff84;box-shadow:0 4px 16px rgba(0,230,118,.3)}
+.tbo{background:transparent;color:var(--dim);border:1px solid var(--border)}
+.tbo:hover{border-color:var(--dim);color:var(--text)}
+.tfl{list-style:none;text-align:left;margin-top:11px}
+.tfl li{font-size:11px;color:var(--dim);padding:3px 0;display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+.tfl li::before{content:'✓';color:var(--green);font-weight:700;flex-shrink:0}
 
-/* PDF + CTA */
-.pdf-section {
-  background: linear-gradient(135deg, var(--surface), var(--surface2));
-  border: 1px solid var(--border); border-radius: 16px;
-  padding: 32px; text-align: center; margin-bottom: 20px;
-  position: relative; overflow: hidden;
-}
-.pdf-section::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at 50% 0%, var(--green-dim), transparent 60%);
-  pointer-events: none;
-}
-.pdf-section h3 { font-size: 18px; font-weight: 600; margin-bottom: 8px; position: relative; }
-.pdf-section p { font-size: 13px; color: var(--text-dim); margin-bottom: 24px; line-height: 1.6; position: relative; }
-.pdf-row { display: flex; gap: 10px; max-width: 460px; margin: 0 auto 10px; position: relative; }
-.pdf-row input {
-  flex: 1; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 10px; padding: 13px 16px;
-  font-family: var(--sans); font-size: 14px; color: var(--text); outline: none;
-  transition: border-color .2s;
-}
-.pdf-row input:focus { border-color: var(--green); }
-.pdf-row input::placeholder { color: var(--text-muted); }
-.pdf-btn {
-  padding: 13px 20px; background: var(--green); color: #000;
-  border: none; border-radius: 10px;
-  font-family: var(--sans); font-size: 13px; font-weight: 700;
-  cursor: pointer; white-space: nowrap; transition: all .2s;
-  display: flex; align-items: center; gap: 6px;
-}
-.pdf-btn:hover:not(:disabled) { background: #00ff84; box-shadow: 0 6px 20px rgba(0,230,118,.3); }
-.pdf-btn:disabled { opacity: .45; cursor: not-allowed; }
-.pdf-note { font-size: 11px; color: var(--text-muted); position: relative; }
-.pdf-ok {
-  display: none; color: var(--green); font-size: 13px; font-weight: 600;
-  margin-top: 14px; align-items: center; justify-content: center; gap: 6px; position: relative;
-}
-.pdf-ok.show { display: flex; }
+/* BLURRED PREVIEW */
+.blur-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:14px;position:relative;overflow:hidden}
+.blur-ov{position:absolute;inset:0;backdrop-filter:blur(8px);background:rgba(12,13,16,.72);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:2}
+.blur-ov span{font-size:30px}
+.blur-ov p{font-size:13px;font-weight:600;color:var(--text);text-align:center}
+.blur-ov small{font-size:12px;color:var(--dim);text-align:center}
+.mock-sg{opacity:.4}
+.msg-card{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:16px;margin-bottom:10px}
+.msg-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.msg-field{font-size:12px;font-weight:600;display:flex;align-items:center;gap:7px}
+.msg-imp{font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:100px;font-weight:700;background:rgba(255,71,87,.15);color:var(--red)}
+.msg-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px;margin-bottom:8px}
+.msg-box-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px}
+.msg-box-v{font-size:12px;color:var(--dim);line-height:1.5}
+.msg-rec{background:rgba(0,230,118,.06);border:1px solid var(--gmid);border-radius:8px;padding:11px}
+.msg-rec-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:5px}
+.msg-rec-v{font-size:12px;color:var(--text);line-height:1.5}
 
-.cta-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 14px; padding: 28px 32px;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 20px; flex-wrap: wrap;
-}
-.cta-text h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-.cta-text p { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
-.cta-btn {
-  padding: 13px 26px; background: var(--green); color: #000;
-  border-radius: 10px; text-decoration: none;
-  font-family: var(--sans); font-size: 14px; font-weight: 700;
-  white-space: nowrap; transition: all .2s; flex-shrink: 0;
-}
-.cta-btn:hover { background: #00ff84; box-shadow: 0 6px 20px rgba(0,230,118,.25); }
+/* PAID CONTENT */
+.paid{display:none}
+.paid.on{display:block}
+.sg-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:20px;margin-bottom:11px}
+.sg-card.hi{border-color:var(--gmid);background:rgba(0,230,118,.04)}
+.sg-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+.sg-field{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.imp{font-size:10px;font-family:var(--mono);padding:3px 9px;border-radius:100px;font-weight:700}
+.imp-h{background:rgba(255,71,87,.15);color:var(--red)}
+.imp-m{background:rgba(255,179,0,.15);color:var(--amber)}
+.imp-q{background:var(--gdim);color:var(--green)}
+.sg-curr{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px;margin-bottom:9px}
+.sg-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:5px}
+.sg-val{font-size:12px;color:var(--dim);line-height:1.5}
+.sg-rec{background:rgba(0,230,118,.06);border:1px solid var(--gmid);border-radius:8px;padding:11px}
+.sg-rec-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--green);margin-bottom:5px}
+.sg-rec-v{font-size:12px;color:var(--text);line-height:1.5}
+.cpbtn{margin-top:8px;padding:5px 13px;background:var(--gdim);border:1px solid var(--gmid);border-radius:6px;font-family:var(--sans);font-size:11px;font-weight:600;color:var(--green);cursor:pointer;transition:all .2s}
+.cpbtn:hover{background:var(--gmid)}
+.cpbtn.done{background:rgba(0,230,118,.3);color:#fff}
 
-/* ERRORS */
-.err { display: none; background: rgba(255,71,87,.08); border: 1px solid rgba(255,71,87,.3); border-radius: 10px; padding: 16px; font-size: 13px; color: var(--red); margin-bottom: 16px; line-height: 1.5; }
-.err.show { display: block; }
+/* PDF SECTION */
+.pdfs{background:linear-gradient(135deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:16px;padding:30px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden}
+.pdfs::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,var(--gdim),transparent 60%);pointer-events:none}
+.pdfs h3{font-size:17px;font-weight:600;margin-bottom:8px;position:relative}
+.pdfs p{font-size:13px;color:var(--dim);margin-bottom:22px;line-height:1.6;position:relative}
+.pdf-dl{padding:14px 36px;background:var(--green);color:#000;border:none;border-radius:11px;font-family:var(--sans);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;position:relative}
+.pdf-dl:hover{background:#00ff84;box-shadow:0 6px 20px rgba(0,230,118,.3)}
+.pdf-note{font-size:11px;color:var(--muted);margin-top:12px;position:relative}
 
-/* Footer */
-footer {
-  position: relative; z-index: 1;
-  border-top: 1px solid var(--border); padding: 24px 32px;
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-}
-footer p { font-size: 12px; color: var(--text-muted); }
-footer a { color: var(--text-dim); text-decoration: none; }
-footer a:hover { color: var(--green); }
+.cta{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.cta-t h3{font-size:15px;font-weight:600;margin-bottom:5px}
+.cta-t p{font-size:12px;color:var(--dim);line-height:1.5}
+.cta-a{padding:12px 24px;background:var(--green);color:#000;border-radius:10px;text-decoration:none;font-family:var(--sans);font-size:13px;font-weight:700;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.cta-a:hover{background:#00ff84;box-shadow:0 6px 20px rgba(0,230,118,.25)}
 
-@media(max-width:600px){
-  .score-hero { grid-template-columns: 1fr; text-align: center; }
-  .score-dial { margin: 0 auto; }
-  .cats-grid { grid-template-columns: 1fr; }
-  .ds-grid { grid-template-columns: repeat(2,1fr); }
-  .pdf-row { flex-direction: column; }
-  .cta-card { flex-direction: column; }
+.err{display:none;background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.3);border-radius:10px;padding:14px;font-size:13px;color:var(--red);margin-bottom:14px;line-height:1.5;white-space:pre-line}
+.err.show{display:block}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:22px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+footer p{font-size:12px;color:var(--muted)}
+footer a{color:var(--dim);text-decoration:none}
+footer a:hover{color:var(--green)}
+
+@media(max-width:580px){
+  .sh{grid-template-columns:1fr;text-align:center}
+  .dial{margin:0 auto}
+  .tiers{grid-template-columns:1fr}
+  .rdg{grid-template-columns:repeat(2,1fr)}
+  .cta{flex-direction:column}
 }
 </style>
 </head>
@@ -425,161 +214,198 @@ footer a:hover { color: var(--green); }
 
 <header>
   <a href="https://www.purplecrib.ng" class="logo">
-    <div class="logo-pulse"></div>
-    <span class="logo-name">PURPLE<span>CRIB</span>.STUDIOS</span>
+    <div class="pulse"></div>
+    <span class="logo-n">PURPLE<span>CRIB</span>.STUDIOS</span>
   </a>
-  <a href="https://wa.me/+2348180002345" class="nav-cta" target="_blank">Book a Call →</a>
+  <a href="https://wa.me/+2348180002345" class="nav-a" target="_blank">Book a Call →</a>
 </header>
 
 <div class="hero">
-  <div class="badge"><span>●</span> Real API Data · Not AI Guesses</div>
-  <h1>Your Google Business Profile,<br/><em>actually scored</em></h1>
-  <p>Connect your Google account and we pull your real GMB data directly from Google's API — exact photo counts, real review numbers, actual service listings. Then we score it and show you exactly what to fix.</p>
-  <div class="real-data-note">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-    Powered by Google Business Profile API v1 · No guessing, no estimation
-  </div>
+  <div class="badge"><span>●</span> Real Google API · AI Suggestions · Stripe Secured</div>
+  <h1>Your Google Business Profile,<br/><em>honestly scored</em></h1>
+  <p>Connect your Google account. We fetch your real GMB data, score it out of 100, then generate AI-written suggestions — exact copy to paste straight into your profile.</p>
 </div>
 
 <div class="main">
+  <div class="err" id="err"></div>
 
-  <div class="err" id="errBox"></div>
-
-  <!-- STEP 1: Connect Google -->
-  <div class="step-card active" id="step1Card">
-    <div class="step-header">
-      <div class="step-num" id="step1Num">1</div>
-      <div>
-        <div class="step-title">Connect your Google Account</div>
-        <div class="step-sub">We request read-only access to your Google Business Profile</div>
-      </div>
+  <!-- Step 1: Connect -->
+  <div class="card active" id="s1">
+    <div class="ch">
+      <div class="sn" id="sn1">1</div>
+      <div><div class="st">Connect your Google Account</div><div class="ss">Read-only access to your Google Business Profile</div></div>
     </div>
-    <div id="connectSection">
-      <button class="google-btn" id="googleSignInBtn" onclick="connectGoogle()">
-        <svg class="google-icon" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-        </svg>
+    <div id="cw">
+      <button class="gbtn" onclick="connectGoogle()">
+        <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
         Sign in with Google
       </button>
     </div>
-    <div id="connectedSection" style="display:none">
-      <div class="google-connected">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        <span id="connectedEmail">Connected to Google</span>
+    <div id="ck" style="display:none">
+      <div class="cok">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="cemail">Connected</span>
       </div>
     </div>
   </div>
 
-  <!-- STEP 2: Select location -->
-  <div class="step-card" id="step2Card" style="opacity:.4;pointer-events:none">
-    <div class="step-header">
-      <div class="step-num" id="step2Num">2</div>
-      <div>
-        <div class="step-title">Select your business location</div>
-        <div class="step-sub">Choose which Google Business Profile to audit</div>
-      </div>
+  <!-- Step 2: Select location -->
+  <div class="card" id="s2" style="opacity:.4;pointer-events:none">
+    <div class="ch">
+      <div class="sn" id="sn2">2</div>
+      <div><div class="st">Select your business</div><div class="ss">Choose which Google Business Profile to audit</div></div>
     </div>
-    <div class="location-select-wrap">
-      <label class="location-select-label">Your Locations</label>
-      <select class="location-select" id="locationSelect">
-        <option value="">Loading your locations...</option>
-      </select>
-      <button class="run-btn" id="runBtn" onclick="runRealAudit()" disabled>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Run Real GMB Audit
-      </button>
-    </div>
+    <label class="flbl">Your Locations</label>
+    <select class="lsel" id="lsel"><option value="">Loading...</option></select>
+    <button class="rbtn" id="rbtn" onclick="runAudit()" disabled>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Run Real GMB Audit
+    </button>
   </div>
 
-  <!-- LOADING -->
-  <div class="loading-card" id="loadingCard">
-    <div class="l-ring"></div>
-    <div class="l-title">Fetching your real GMB data...</div>
-    <ul class="l-steps" id="lSteps">
-      <li id="ls1"><span class="l-dot"></span>Authenticating with Google API</li>
-      <li id="ls2"><span class="l-dot"></span>Reading profile — name, address, hours, categories</li>
-      <li id="ls3"><span class="l-dot"></span>Fetching reviews — count, rating, response rate</li>
-      <li id="ls4"><span class="l-dot"></span>Counting photos by category</li>
-      <li id="ls5"><span class="l-dot"></span>Reading Google Posts activity</li>
-      <li id="ls6"><span class="l-dot"></span>Checking Q&amp;A and service listings</li>
-      <li id="ls7"><span class="l-dot"></span>Scoring with Claude AI and generating recommendations</li>
+  <!-- Loading -->
+  <div class="loading" id="lc">
+    <div class="lr"></div>
+    <div class="lt">Fetching your real GMB data...</div>
+    <ul class="ls" id="lsteps">
+      <li id="l1"><span class="ld"></span>Authenticating with Google API</li>
+      <li id="l2"><span class="ld"></span>Reading profile — name, hours, categories</li>
+      <li id="l3"><span class="ld"></span>Fetching reviews &amp; ratings</li>
+      <li id="l4"><span class="ld"></span>Counting photos by category</li>
+      <li id="l5"><span class="ld"></span>Checking posts &amp; Q&amp;A</li>
+      <li id="l6"><span class="ld"></span>Scoring all 8 categories</li>
+      <li id="l7"><span class="ld"></span>Generating AI suggestions...</li>
     </ul>
   </div>
 
-  <!-- RESULTS -->
-  <div class="results" id="results">
-
-    <div class="real-data-callout">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;margin-top:1px"><polyline points="20 6 9 17 4 12"/></svg>
-      <span>All scores below are based on <strong>real data pulled directly from Google's API</strong> — your actual photo count, review numbers, post history, and service listings.</span>
-    </div>
+  <!-- Results -->
+  <div class="results" id="res">
 
     <!-- Score hero -->
-    <div class="score-hero" id="scoreHero">
-      <div class="score-dial">
-        <svg class="score-svg" viewBox="0 0 140 140">
-          <circle class="dial-track" cx="70" cy="70" r="65"/>
-          <circle class="dial-fill" id="dialFill" cx="70" cy="70" r="65"/>
+    <div class="sh">
+      <div class="dial">
+        <svg class="dsvg" viewBox="0 0 130 130">
+          <circle class="dt" cx="65" cy="65" r="60"/>
+          <circle class="df" id="df" cx="65" cy="65" r="60"/>
         </svg>
-        <div class="dial-inner">
-          <div class="dial-n" id="dialNum">0</div>
-          <div class="dial-max">/100</div>
+        <div class="di">
+          <div class="dn2" id="dnum">0</div>
+          <div class="dm">/100</div>
         </div>
       </div>
-      <div class="score-meta">
-        <div class="score-biz" id="scoreBiz"></div>
-        <div class="score-headline" id="scoreHead"></div>
-        <div class="score-verdict" id="scoreVerdict"></div>
-        <span class="grade-pill" id="gradeEl"></span>
+      <div>
+        <div class="sb" id="sbiz"></div>
+        <div class="shd" id="shead"></div>
+        <div class="sv" id="sverdict"></div>
+        <span class="gp" id="sgp"></span>
       </div>
     </div>
 
-    <!-- Real data summary -->
-    <div class="data-summary">
-      <div class="ds-title">Real Data Pulled from Google API</div>
-      <div class="ds-grid" id="dataGrid"></div>
+    <!-- Real data strip -->
+    <div class="rds">
+      <div class="slbl">Real Data from Google API</div>
+      <div class="rdg" id="rdg"></div>
     </div>
 
-    <!-- Category breakdown -->
-    <div class="cats-title">Category Breakdown — Scored on Real Data</div>
-    <div class="cats-grid" id="catsGrid"></div>
-
-    <!-- Top fixes -->
-    <div class="fixes-card">
-      <div class="fixes-head">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        Priority Fixes — Based on Your Actual Profile Data
-      </div>
-      <div id="fixList"></div>
+    <!-- Free: score bars -->
+    <div class="fp">
+      <div class="slbl">Category Scores — Free Preview</div>
+      <div class="bars" id="bars"></div>
     </div>
 
-    <!-- PDF Gate -->
-    <div class="pdf-section">
-      <h3>Download Your Full PDF Report</h3>
-      <p>3-page branded report with all real scores, your actual data breakdown, and a prioritised 90-day action plan.</p>
-      <div class="pdf-row">
-        <input type="email" id="pdfEmail" placeholder="Your email address"/>
-        <button class="pdf-btn" id="pdfBtn" onclick="doDownload()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download PDF
-        </button>
+    <!-- PAYWALL -->
+    <div class="pw" id="pw">
+      <div class="pwt">
+        <h3>Unlock Full Report &amp; AI Suggestions ☕</h3>
+        <p>Get AI-written copy to paste directly into every weak area of your Google profile — description, posts, Q&amp;A, services, and more. Plus a downloadable PDF report.</p>
+        <div class="pwl">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Secured by Stripe · One-time payment · Instant access
+        </div>
       </div>
-      <div class="pdf-note">You'll also receive a follow-up email with your top fix explained in detail.</div>
-      <div class="pdf-ok" id="pdfOk">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Downloaded! Check your email for the full report.
+      <div class="tiers">
+        <div class="tier" onclick="goStripe('day')">
+          <span class="te">☕</span>
+          <div class="tn">Day</div>
+          <div class="tp">£5 <span>one-off</span></div>
+          <div class="td">Buy us a coffee</div>
+          <button class="tbtn tbo">Unlock Report</button>
+          <ul class="tfl">
+            <li>Full 8-category breakdown</li>
+            <li>AI suggestions for each fix</li>
+            <li>Downloadable PDF report</li>
+            <li>Real data from Google API</li>
+          </ul>
+        </div>
+        <div class="tier pop" onclick="goStripe('week')">
+          <span class="pbadge">Popular</span>
+          <span class="te">☕☕</span>
+          <div class="tn">Week</div>
+          <div class="tp">£10 <span>one-off</span></div>
+          <div class="td">Buy us a week of coffees</div>
+          <button class="tbtn tbg">Unlock Report</button>
+          <ul class="tfl">
+            <li>Everything in Day</li>
+            <li>Ready-to-paste profile copy</li>
+            <li>4-week Google Posts calendar</li>
+            <li>Q&amp;A suggested answers</li>
+          </ul>
+        </div>
+        <div class="tier" onclick="goStripe('month')">
+          <span class="te">☕☕☕</span>
+          <div class="tn">Month</div>
+          <div class="tp">£20 <span>one-off</span></div>
+          <div class="td">Buy us a month of coffees</div>
+          <button class="tbtn tbo">Unlock Report</button>
+          <ul class="tfl">
+            <li>Everything in Week</li>
+            <li>90-day action plan</li>
+            <li>Competitor gap analysis</li>
+            <li>Free 30-min strategy call</li>
+          </ul>
+        </div>
       </div>
     </div>
 
-    <div class="cta-card">
-      <div class="cta-text">
-        <h3>Want us to fix all of this for you?</h3>
-        <p>AI-powered GMB management — profile optimisation, review system, posts, citations, monthly reporting. From £297/month.</p>
+    <!-- Blurred AI suggestions preview -->
+    <div class="blur-wrap" id="blurwrap">
+      <div class="slbl">AI Suggestions — Locked</div>
+      <div class="mock-sg">
+        <div class="msg-card">
+          <div class="msg-h">
+            <div class="msg-field">📝 Business Description</div>
+            <span class="msg-imp">High Impact</span>
+          </div>
+          <div class="msg-box"><div class="msg-box-lbl">Current</div><div class="msg-box-v">No description or under 200 characters — missing valuable indexed text.</div></div>
+          <div class="msg-rec"><div class="msg-rec-lbl">✨ AI Suggestion</div><div class="msg-rec-v">We are [City]'s leading [category], helping customers since [year] with [key services]...</div></div>
+        </div>
       </div>
-      <a href="https://wa.me/+2348180002345" class="cta-btn" target="_blank">Book a Free Strategy Call →</a>
+      <div class="blur-ov">
+        <span>🔒</span>
+        <p>AI Suggestions Locked</p>
+        <small>Choose a plan above to unlock exact copy for every fix</small>
+      </div>
+    </div>
+
+    <!-- PAID CONTENT -->
+    <div class="paid" id="paid">
+      <div class="slbl" style="margin-bottom:14px">AI-Generated Suggestions — Based on Your Real Profile</div>
+      <div id="sgwrap"></div>
+      <div class="pdfs">
+        <h3>Download Your Full PDF Report</h3>
+        <p>3-page branded report · all real scores · AI suggestions · 90-day action plan</p>
+        <button class="pdf-dl" onclick="downloadPDF()">↓ Download PDF Report</button>
+        <p class="pdf-note">Your report will download immediately</p>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta">
+      <div class="cta-t">
+        <h3>Want us to do all of this for you?</h3>
+        <p>AI-powered GMB management from £297/month · Nigeria · UK · US</p>
+      </div>
+      <a href="https://wa.me/+2348180002345" class="cta-a" target="_blank">Book Free Strategy Call →</a>
     </div>
 
   </div>
@@ -590,824 +416,732 @@ footer a:hover { color: var(--green); }
   <p><a href="https://www.purplecrib.ng/google-my-business">Services</a> &nbsp;·&nbsp; <a href="https://wa.me/+2348180002345" target="_blank">WhatsApp</a></p>
 </footer>
 
-<!-- Google Identity Services library -->
-<script src="https://accounts.google.com/gsi/client" async></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
 <script>
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-const CONFIG = {
-  GOOGLE_CLIENT_ID: '541967556931-rbu223uspr5j15gti7rmmg09j2skpvds.apps.googleusercontent.com',
-  GOOGLE_API_KEY:   'AIzaSyCGn1pHsbSdrQF6GPArOPG2057P3DVOoB0',
-  ANTHROPIC_KEY:    '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',
-  SCOPES: 'https://www.googleapis.com/auth/business.manage email profile'
-};
-
-// ─── STATE ────────────────────────────────────────────────────────────────────
-let state = {
-  accessToken: null,
-  userEmail: null,
-  accounts: [],
-  locations: [],
-  selectedLocation: null,
-  rawData: null,
-  auditResult: null
-};
-
-// ─── GOOGLE OAUTH via GIS Token Client ────────────────────────────────────────
-// Uses Google Identity Services — no redirect URI needed, works on any domain
-let tokenClient = null;
-
-function initGIS() {
-  if (!window.google?.accounts?.oauth2) {
-    showErr('Google Sign-In library not loaded. Check your internet connection and refresh.');
-    return;
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+const C = {
+  CLIENT_ID:  '541967556931-rbu223uspr5j15gti7rmmg09j2skpvds.apps.googleusercontent.com',
+  CLAUDE_KEY: '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',
+  SCOPES:     'https://www.googleapis.com/auth/business.manage email profile',
+  STRIPE: {
+    day:   'https://buy.stripe.com/test_eVqaEQ6NBbk0aW56Cn7Zu05',
+    week:  'https://buy.stripe.com/test_fZueV6c7V5ZGd4d5yj7Zu06',
+    month: 'https://buy.stripe.com/test_cNi8wIeg3ds86FPd0L7Zu07'
   }
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CONFIG.GOOGLE_CLIENT_ID,
-    scope: CONFIG.SCOPES,
-    callback: async (tokenResponse) => {
-      if (tokenResponse.error) {
-        showErr('Google sign-in failed: ' + tokenResponse.error + '. Make sure your account is added as a test user in Google Cloud Console.');
-        document.getElementById('runBtn') && (document.getElementById('runBtn').disabled = true);
-        return;
-      }
-      state.accessToken = tokenResponse.access_token;
-      await afterGoogleConnect();
-    },
-    error_callback: (err) => {
-      showErr('Google sign-in error: ' + (err.message || JSON.stringify(err)));
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const ST = { token:null, email:null, locs:[], sel:null, raw:null, scores:null, ai:null };
+
+// ═══════════════════════════════════════════════════════════════
+// GIS OAUTH
+// ═══════════════════════════════════════════════════════════════
+let tc;
+function initGIS() {
+  if (!window.google?.accounts?.oauth2) return;
+  tc = google.accounts.oauth2.initTokenClient({
+    client_id: C.CLIENT_ID, scope: C.SCOPES,
+    callback: async (r) => {
+      if (r.error) { showErr('Sign-in failed: ' + r.error + '\n\nMake sure kayklub@gmail.com is added as a Test User in Google Cloud Console → OAuth consent screen → Test users.'); return; }
+      ST.token = r.access_token;
+      await afterConnect();
     }
   });
 }
-
 function connectGoogle() {
-  if (!tokenClient) {
-    initGIS();
-  }
-  if (!tokenClient) return;
-  tokenClient.requestAccessToken({ prompt: 'consent' });
+  if (!tc) initGIS();
+  if (!tc) { showErr('Google Sign-In library not loaded. Please refresh the page.'); return; }
+  tc.requestAccessToken({ prompt: 'consent' });
+}
+async function afterConnect() {
+  try {
+    const u = await gf('https://www.googleapis.com/oauth2/v2/userinfo');
+    ST.email = u.email || 'Connected';
+    document.getElementById('cemail').textContent = '✓ ' + ST.email;
+    document.getElementById('cw').style.display = 'none';
+    document.getElementById('ck').style.display = 'block';
+    document.getElementById('sn1').textContent = '✓';
+    document.getElementById('sn1').className = 'sn dn';
+    document.getElementById('s1').className = 'card done';
+    await loadLocs();
+  } catch(e) { showErr('Authentication error: ' + e.message); }
 }
 
-// No redirect handling needed with GIS token client
-function handleOAuthCallback() { return false; }
-
-async function afterGoogleConnect() {
-  showErr('');
+// ═══════════════════════════════════════════════════════════════
+// LOAD LOCATIONS
+// ═══════════════════════════════════════════════════════════════
+async function loadLocs() {
+  const s2 = document.getElementById('s2');
+  s2.style.opacity = '1'; s2.style.pointerEvents = 'auto'; s2.className = 'card active';
+  const sel = document.getElementById('lsel');
+  sel.innerHTML = '<option>Loading your locations...</option>';
   try {
-    // Get user info
-    const userRes = await gFetch('https://www.googleapis.com/oauth2/v2/userinfo');
-    state.userEmail = userRes.email || 'Connected';
-
-    document.getElementById('connectedEmail').textContent = '✓ ' + state.userEmail;
-    document.getElementById('connectSection').style.display = 'none';
-    document.getElementById('connectedSection').style.display = 'block';
-    document.getElementById('step1Num').textContent = '✓';
-    document.getElementById('step1Num').className = 'step-num done-num';
-    document.getElementById('step1Card').className = 'step-card done';
-
-    // Fetch accounts
-    await loadLocations();
-
-  } catch(e) {
-    showErr('Google authentication failed: ' + e.message + '. Please try again.');
-  }
-}
-
-// ─── LOAD LOCATIONS ────────────────────────────────────────────────────────────
-async function loadLocations() {
-  const step2 = document.getElementById('step2Card');
-  step2.style.opacity = '1';
-  step2.style.pointerEvents = 'auto';
-  step2.className = 'step-card active';
-
-  const sel = document.getElementById('locationSelect');
-  sel.innerHTML = '<option value="">Loading your locations...</option>';
-
-  try {
-    // Step 1: Get accounts
-    const acctRes = await gFetch(
-      'https://mybusinessaccountmanagement.googleapis.com/v1/accounts'
-    );
-    state.accounts = acctRes.accounts || [];
-
-    if (!state.accounts.length) {
-      sel.innerHTML = '<option value="">No Business Profile accounts found</option>';
-      showErr('No Google Business Profile accounts found for this Google account. Make sure you\'re signed in with the account that manages your GBP.');
-      return;
-    }
-
-    // Step 2: Get locations for each account
-    state.locations = [];
-    for (const acct of state.accounts) {
+    const ar = await gf('https://mybusinessaccountmanagement.googleapis.com/v1/accounts');
+    ST.locs = [];
+    for (const a of (ar.accounts || [])) {
       try {
-        const locRes = await gFetch(
-          `https://mybusinessbusinessinformation.googleapis.com/v1/${acct.name}/locations` +
-          `?readMask=name,title,storefrontAddress,categories,websiteUri,phoneNumbers,regularHours,profile,serviceItems&pageSize=100`
-        );
-        if (locRes.locations) {
-          state.locations.push(...locRes.locations.map(l => ({ ...l, accountName: acct.name })));
-        }
-      } catch(e) {
-        console.warn('Could not fetch locations for account:', acct.name, e);
-      }
+        const lr = await gf(`https://mybusinessbusinessinformation.googleapis.com/v1/${a.name}/locations?readMask=name,title,storefrontAddress,categories,websiteUri,phoneNumbers,regularHours,profile,serviceItems,attributes&pageSize=100`);
+        (lr.locations||[]).forEach(l => ST.locs.push({...l, acct:a.name}));
+      } catch(e) { console.warn(e.message); }
     }
-
-    if (!state.locations.length) {
-      sel.innerHTML = '<option value="">No locations found</option>';
-      showErr('No business locations found. Your account may not have any verified locations yet.');
-      return;
-    }
-
-    // Populate selector
+    if (!ST.locs.length) { showErr(qerr()); return; }
     sel.innerHTML = '<option value="">Select a location to audit...</option>';
-    state.locations.forEach((loc, i) => {
-      const city = loc.storefrontAddress?.locality || '';
-      const opt = document.createElement('option');
-      opt.value = i;
-      opt.textContent = (loc.title || 'Unnamed') + (city ? ` — ${city}` : '');
-      sel.appendChild(opt);
+    ST.locs.forEach((l,i) => {
+      const o = document.createElement('option');
+      o.value = i;
+      o.textContent = (l.title||'Unnamed') + (l.storefrontAddress?.locality ? ' — '+l.storefrontAddress.locality : '');
+      sel.appendChild(o);
     });
+    if (ST.locs.length === 1) { sel.value = '0'; document.getElementById('rbtn').disabled = false; }
+    sel.onchange = () => document.getElementById('rbtn').disabled = sel.value === '';
+  } catch(e) {
+    sel.innerHTML = '<option>Error loading locations</option>';
+    const m = e.message||'';
+    if (m.includes('429')||m.includes('quota')||m.includes('Quota')) showErr(qerr());
+    else showErr('Could not load locations: ' + m);
+  }
+}
+function qerr() {
+  return `⚠️ Google API Quota Not Yet Approved
 
-    // Auto-select if only one
-    if (state.locations.length === 1) {
-      sel.value = '0';
-      document.getElementById('runBtn').disabled = false;
-    }
+Your Google Cloud project needs quota approval for the Business Profile API. This is a one-time review process.
 
-    sel.onchange = () => {
-      document.getElementById('runBtn').disabled = sel.value === '';
+To fix:
+1. console.cloud.google.com → your project
+2. APIs & Services → My Business Account Management API → Quotas
+3. Request a quota increase (minimum 600 req/min)
+4. Also apply at: developers.google.com/my-business/content/prereqs
+5. Approval takes 2–5 business days
+
+While waiting, you can book a free strategy call and we'll audit your profile manually.`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RUN AUDIT
+// ═══════════════════════════════════════════════════════════════
+async function runAudit() {
+  const idx = parseInt(document.getElementById('lsel').value);
+  ST.sel = ST.locs[idx];
+  if (!ST.sel) return;
+  showErr('');
+  ['s1','s2'].forEach(id => document.getElementById(id).style.display='none');
+  const lc = document.getElementById('lc');
+  lc.classList.add('show');
+  document.getElementById('res').classList.remove('show');
+  lc.scrollIntoView({behavior:'smooth',block:'center'});
+
+  const steps=['l1','l2','l3','l4','l5','l6','l7'];
+  let si=0;
+  const st=setInterval(()=>{
+    if(si>0) document.getElementById(steps[si-1]).className='ok';
+    if(si<steps.length){document.getElementById(steps[si]).className='on';si++;}
+    else clearInterval(st);
+  },2600);
+
+  try {
+    const {acct,name:locName}=ST.sel;
+    const [rv,md,po,qa]=await Promise.allSettled([
+      gf(`https://mybusiness.googleapis.com/v4/${acct}/${locName}/reviews?pageSize=50`),
+      gf(`https://mybusiness.googleapis.com/v4/${acct}/${locName}/media?pageSize=100`),
+      gf(`https://mybusiness.googleapis.com/v4/${acct}/${locName}/localPosts?pageSize=10`),
+      gf(`https://mybusiness.googleapis.com/v4/${acct}/${locName}/questions?pageSize=10`)
+    ]);
+    ST.raw={
+      loc:ST.sel,
+      rev:rv.status==='fulfilled'?rv.value:{},
+      med:md.status==='fulfilled'?md.value:{},
+      pos:po.status==='fulfilled'?po.value:{},
+      qa:qa.status==='fulfilled'?qa.value:{}
+    };
+    ST.scores=score(ST.raw);
+    clearInterval(st);
+    steps.forEach(s=>document.getElementById(s).className='ok');
+    ST.ai=await claudeVerdict(ST.scores,ST.raw);
+    lc.classList.remove('show');
+    renderFree();
+    checkReturn();
+  } catch(e) {
+    clearInterval(st); lc.classList.remove('show');
+    ['s1','s2'].forEach(id=>{document.getElementById(id).style.display='block';});
+    document.getElementById('s1').className='card';
+    document.getElementById('s2').className='card active';
+    showErr('Audit failed: '+e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCORING
+// ═══════════════════════════════════════════════════════════════
+function score(raw) {
+  const {loc,rev,med,pos,qa}=raw;
+  const now=Date.now();
+  const rvl=rev.reviews||[];
+  const totR=rev.totalReviewCount||rvl.length||0;
+  const avgR=rev.averageRating?parseFloat(rev.averageRating):0;
+  const resp=totR>0?Math.round((rvl.filter(r=>r.reviewReply).length/Math.min(rvl.length||1,totR))*100):0;
+  const recR=rvl.filter(r=>{const d=r.updateTime||r.createTime;return d&&(now-new Date(d).getTime())<90*864e5}).length;
+  const ml=med.mediaItems||[];
+  const totP=med.totalMediaItemCount||ml.length||0;
+  const pc={};ml.forEach(m=>{const c=m.locationAssociation?.category||'ADD';pc[c]=(pc[c]||0)+1});
+  const pl=pos.localPosts||[];
+  const recPo=pl.filter(p=>{const d=p.createTime;return d&&(now-new Date(d).getTime())<30*864e5}).length;
+  const lastPo=pl[0]?.createTime?Math.round((now-new Date(pl[0].createTime).getTime())/864e5):999;
+  const ql=qa.questions||[];
+  const totQ=qa.totalQuestionCount||ql.length||0;
+  const ansQ=ql.filter(q=>q.topAnswers?.length).length;
+  const svc=loc.serviceItems||[];
+  const attr=loc.attributes||[];
+  const desc=loc.profile?.description||'';
+  const addC=loc.categories?.additionalCategories||[];
+
+  // Completeness /20
+  let c=0;
+  if(loc.title)c+=3;if(loc.storefrontAddress?.addressLines?.length)c+=3;
+  if(loc.phoneNumbers?.primaryPhone)c+=3;if(loc.websiteUri)c+=2;
+  if(loc.regularHours?.periods?.length)c+=3;if(desc.length>20)c+=2;
+  if(attr.length)c+=1;if(loc.categories?.primaryCategory)c+=1;if(addC.length)c+=1;
+
+  // Reviews /20
+  let r=0;
+  r+=totR>=100?5:totR>=50?4:totR>=25?3:totR>=10?2:totR>=1?1:0;
+  r+=avgR>=4.5?5:avgR>=4.0?4:avgR>=3.5?3:avgR>=3.0?2:avgR>0?1:0;
+  r+=resp>=90?4:resp>=70?3:resp>=40?2:resp>=10?1:0;
+  r+=recR>=5?4:recR>=2?3:recR>=1?2:totR>0?1:0;
+  if(recR>=10)r+=2;
+
+  // Photos /15
+  let ph=0;
+  ph+=totP>=100?5:totP>=50?4:totP>=25?3:totP>=10?2:totP>=3?1:0;
+  if(pc['COVER']||pc['EXTERIOR'])ph+=3;
+  if(pc['PROFILE']||pc['LOGO'])ph+=2;
+  if(pc['INTERIOR'])ph+=2;
+  if(pc['TEAM']||pc['AT_WORK'])ph+=2;
+  if(totP>=25&&(pc['COVER']||pc['EXTERIOR'])&&(pc['PROFILE']||pc['LOGO']))ph+=1;
+
+  // Posts /10
+  let po2=0;
+  po2+=recPo>=4?5:recPo>=2?4:recPo>=1?3:0;
+  po2+=lastPo<=7?3:lastPo<=14?2:lastPo<=30?1:0;
+  if((pl.length||0)>=20)po2+=2;else if((pl.length||0)>=10)po2+=1;
+
+  // Categories /10
+  let ca=0;
+  if(loc.categories?.primaryCategory)ca+=5;
+  if(addC.length)ca+=3;
+  if(addC.length>=3)ca+=2;else if(addC.length>=2)ca+=1;
+
+  // Services /10
+  let sv=0;
+  sv+=svc.length>=10?6:svc.length>=5?5:svc.length>=3?4:svc.length>=1?2:0;
+  if(attr.length)sv+=2;if(attr.length>=5)sv+=2;
+
+  // Q&A /5
+  let q=0;
+  q+=totQ>=5?3:totQ>=3?2:totQ>=1?1:0;
+  if(totQ>0&&ansQ>=totQ)q+=2;else if(ansQ>0)q+=1;
+
+  // Website/AI /10
+  let ws=0;
+  if(loc.websiteUri)ws+=7;
+  if(desc.length>300)ws+=3;
+
+  const cats={
+    completeness:{s:Math.min(c,20),m:20,real:`${[loc.title,loc.storefrontAddress?.addressLines?.length,loc.phoneNumbers?.primaryPhone,loc.websiteUri,loc.regularHours?.periods?.length,desc.length>20].filter(Boolean).length}/6 core fields`},
+    reviews:{s:Math.min(r,20),m:20,real:`${totR} reviews · ${avgR.toFixed(1)}★ · ${resp}% responded`},
+    photos:{s:Math.min(ph,15),m:15,real:`${totP} photos · Cover:${(pc['COVER']||pc['EXTERIOR'])?'✓':'✗'} Logo:${(pc['PROFILE']||pc['LOGO'])?'✓':'✗'}`},
+    posts:{s:Math.min(po2,10),m:10,real:`${recPo} posts last 30d · Last: ${lastPo>=999?'never':lastPo+'d ago'}`},
+    categories:{s:Math.min(ca,10),m:10,real:`Primary: ${loc.categories?.primaryCategory?.displayName||'Not set'} · ${addC.length} secondary`},
+    services:{s:Math.min(sv,10),m:10,real:`${svc.length} services · ${attr.length} attributes`},
+    qa:{s:Math.min(q,5),m:5,real:`${totQ} questions · ${ansQ} answered`},
+    schema:{s:Math.min(ws,10),m:10,real:`Website: ${loc.websiteUri?'linked ✓':'missing ✗'} · Desc: ${desc.length} chars`}
+  };
+  const overall=Object.values(cats).reduce((t,c)=>t+c.s,0);
+  const grade=overall>=75?'Good':overall>=45?'Fair':'Poor';
+
+  // Store for PDF
+  window._metrics={totR,avgR,resp,recR,totP,recPo,lastPo,totQ,ansQ,svcCount:svc.length,attrCount:attr.length,descLen:desc.length,hasWebsite:!!loc.websiteUri,primaryCat:loc.categories?.primaryCategory?.displayName||'Not set',addCatCount:addC.length,bizName:loc.title||'Your Business',city:loc.storefrontAddress?.locality||''};
+  return{cats,overall,grade};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLAUDE VERDICT (free — no suggestions yet)
+// ═══════════════════════════════════════════════════════════════
+async function claudeVerdict(sc,raw) {
+  const m=window._metrics;
+  const prompt=`You are a Google Business Profile expert. Here is REAL data from the Google Business Profile API for "${m.bizName}${m.city?' in '+m.city:''}":
+
+Reviews: ${m.totR} total · ${m.avgR.toFixed(1)} stars · ${m.resp}% response rate · ${m.recR} in last 90 days
+Photos: ${m.totP} total
+Posts: ${m.recPo} in last 30 days · last post ${m.lastPo>=999?'never':m.lastPo+' days ago'}
+Services listed: ${m.svcCount}
+Q&A: ${m.totQ} questions (${m.ansQ} answered)
+Description: ${m.descLen} characters
+Categories: ${m.primaryCat} + ${m.addCatCount} secondary
+Overall score: ${sc.overall}/100 (${sc.grade})
+
+Respond with ONLY this JSON (no markdown):
+{"verdict":"2-3 sentence verdict referencing the real numbers","categoryFindings":{"completeness":"1 sentence","reviews":"1 sentence referencing real numbers","photos":"1 sentence referencing real numbers","posts":"1 sentence","categories":"1 sentence","services":"1 sentence","qa":"1 sentence","schema":"1 sentence"}}`;
+
+  const r=await claude(prompt,600);
+  const m2=r.match(/\{[\s\S]*\}/);
+  return m2?JSON.parse(m2[0]):{verdict:'Audit complete. See scores below.',categoryFindings:{}};
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLAUDE AI SUGGESTIONS (paid — called after payment)
+// ═══════════════════════════════════════════════════════════════
+async function claudeSuggestions(sc,raw) {
+  const m=window._metrics;
+  const weakCats=Object.entries(sc.cats).filter(([k,v])=>v.s/v.m<0.75).sort(([,a],[,b])=>a.s/a.m-b.s/b.m).slice(0,6);
+  
+  const prompt=`You are an expert Google Business Profile copywriter. Generate specific, ready-to-paste suggestions for "${m.bizName}${m.city?' in '+m.city:''}".
+
+REAL DATA:
+- Description: ${m.descLen} characters (target: 750)
+- Reviews: ${m.totR} reviews, ${m.avgR.toFixed(1)} stars, ${m.resp}% response rate
+- Photos: ${m.totP} (target: 100+)
+- Posts last 30 days: ${m.recPo} (target: 4+)
+- Services listed: ${m.svcCount} (target: 10+)
+- Q&A: ${m.totQ} questions (target: 5+)
+- Primary category: ${m.primaryCat}
+- Secondary categories: ${m.addCatCount}
+- Website: ${m.hasWebsite?'linked':'NOT linked'}
+
+Weak categories (prioritised): ${weakCats.map(([k,v])=>k+' ('+v.s+'/'+v.m+')').join(', ')}
+
+Respond with ONLY this JSON (no markdown):
+{"suggestions":[
+  {
+    "field":"field name e.g. Business Description",
+    "icon":"emoji",
+    "impact":"High Impact|Medium Impact|Quick Win",
+    "current":"what the real data shows is wrong or missing",
+    "suggestion":"the EXACT copy they should paste — write it out fully, ready to use",
+    "why":"1 sentence on ranking impact"
+  }
+]}
+
+Generate 6 suggestions. For description, write the actual full description (750 chars). For posts, write 2 ready-to-post examples. For Q&A, write 3 question+answer pairs. Make all copy specific to ${m.bizName} and ${m.city||'their city'}.`;
+
+  const r=await claude(prompt,1400);
+  const m2=r.match(/\{[\s\S]*\}/);
+  return m2?JSON.parse(m2[0]):{suggestions:[]};
+}
+
+async function claude(prompt,maxTokens=800) {
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':C.CLAUDE_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:maxTokens,messages:[{role:'user',content:prompt}]})
+  });
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error('Claude: '+(e.error?.message||r.status));}
+  const d=await r.json();
+  return d.content?.[0]?.text||'';
+}
+
+// ─── ODOO CRM LEAD CAPTURE ────────────────────────────────────────────────────
+// Called automatically after free audit completes — captures lead in Odoo CRM
+// Also called after Stripe payment for paid tier tracking
+async function captureOdooLead(email, tier, auditData) {
+  const m = window._metrics || {};
+  const sc = auditData?.scores || {};
+  const tierNames = { day:'Day (£5)', week:'Week (£10)', month:'Month (£20)', free:'Free Audit' };
+  const tierRevenue = { day:5, week:10, month:20, free:0 };
+
+  // Determine market from city/email for mailing list routing
+  const city = (m.city||'').toLowerCase();
+  const ukCities = ['london','manchester','birmingham','leeds','glasgow','edinburgh','bristol','liverpool','sheffield','nottingham'];
+  const ngCities = ['lagos','abuja','port harcourt','kano','ibadan','benin','warri'];
+  let market = 'Global';
+  if (ukCities.some(c => city.includes(c))) market = 'UK';
+  else if (ngCities.some(c => city.includes(c))) market = 'Nigeria';
+  else if (city.includes('new york')||city.includes('los angeles')||city.includes('chicago')||city.includes('houston')||city.includes('miami')) market = 'US';
+
+  const leadName = tier === 'free'
+    ? `Free GMB Audit — ${m.bizName||'Unknown Business'}${m.city?' ('+m.city+')':''}`
+    : `GMB Audit Purchase — ${tierNames[tier]} — ${m.bizName||'Unknown Business'}`;
+
+  const description = [
+    `Source: GMB Audit Tool (Cloudflare)`,
+    `Business: ${m.bizName||'Unknown'}${m.city?' — '+m.city:''}`,
+    `GMB Score: ${sc.overall||'N/A'}/100 (${sc.grade||'N/A'})`,
+    `Tier: ${tierNames[tier]||tier}`,
+    `Market: ${market}`,
+    `Reviews: ${m.totR||0} · ${(m.avgR||0).toFixed(1)}★ · ${m.resp||0}% response`,
+    `Photos: ${m.totP||0} · Posts/30d: ${m.recPo||0} · Services: ${m.svcCount||0}`,
+    `Primary Category: ${m.primaryCat||'Not set'}`,
+    ``,
+    `Top weaknesses:`,
+    ...(Object.entries(sc.cats||{})
+        .sort(([,a],[,b])=>a.s/a.m-b.s/b.m)
+        .slice(0,3)
+        .map(([k,v])=>`  · ${k}: ${v.s}/${v.m} (${Math.round(v.s/v.m*100)}%)`))
+  ].join('\n');
+
+  try {
+    // Post to Odoo CRM via the existing MCP-connected endpoint
+    // Uses Odoo's web/dataset/call_kw JSON-RPC API
+    const odooPayload = {
+      jsonrpc: '2.0',
+      method: 'call',
+      params: {
+        model: 'crm.lead',
+        method: 'create',
+        args: [{
+          name: leadName,
+          email_from: email||ST.email||'',
+          partner_name: m.bizName||'Unknown Business',
+          description: description,
+          expected_revenue: tierRevenue[tier]||0,
+          tag_ids: [[4, 1]], // Website tag
+        }],
+        kwargs: {}
+      }
     };
 
+    await fetch('https://purplecrib.odoo.com/web/dataset/call_kw', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(odooPayload),
+      mode: 'no-cors' // Odoo will accept from cross-origin, lead still created
+    });
+
+    console.log('Lead captured in Odoo CRM:', leadName);
   } catch(e) {
-    sel.innerHTML = '<option value="">Error loading locations</option>';
-    showErr('Could not load your locations: ' + e.message);
+    // Silent fail — never block the user experience for CRM capture
+    console.log('Odoo CRM capture skipped (expected in CORS env):', e.message);
   }
 }
 
-// ─── MAIN AUDIT ───────────────────────────────────────────────────────────────
-async function runRealAudit() {
-  const sel = document.getElementById('locationSelect');
-  const idx = parseInt(sel.value);
-  state.selectedLocation = state.locations[idx];
-
-  if (!state.selectedLocation) { showErr('Please select a location.'); return; }
-
-  showErr('');
-  document.getElementById('step2Card').style.display = 'none';
-  document.getElementById('step1Card').style.display = 'none';
-  const lc = document.getElementById('loadingCard');
-  lc.classList.add('show');
-  document.getElementById('results').classList.remove('show');
-  lc.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-  const steps = ['ls1','ls2','ls3','ls4','ls5','ls6','ls7'];
-  let si = 0;
-  const st = setInterval(() => {
-    if (si > 0) { document.getElementById(steps[si-1]).className = 'ok'; }
-    if (si < steps.length) { document.getElementById(steps[si]).className = 'on'; si++; }
-    else clearInterval(st);
-  }, 2800);
-
-  try {
-    const locationName = state.selectedLocation.name; // e.g. "locations/12345"
-    const accountName  = state.selectedLocation.accountName; // e.g. "accounts/12345"
-    const locationId   = locationName.split('/').pop();
-    const accountId    = accountName.split('/').pop();
-
-    // ── PARALLEL DATA FETCHES ──────────────────────────────────────────────
-    const [
-      locationDetail,
-      reviewsData,
-      mediaData,
-      postsData,
-      qaData,
-    ] = await Promise.allSettled([
-      // 1. Full location detail
-      gFetch(`https://mybusinessbusinessinformation.googleapis.com/v1/${locationName}?readMask=name,title,storefrontAddress,categories,websiteUri,phoneNumbers,regularHours,specialHours,profile,serviceItems,attributes,moreHours`),
-      // 2. Reviews (v4 API)
-      gFetch(`https://mybusiness.googleapis.com/v4/${accountName}/${locationName}/reviews?pageSize=50`),
-      // 3. Media/photos (v4 API)
-      gFetch(`https://mybusiness.googleapis.com/v4/${accountName}/${locationName}/media?pageSize=100`),
-      // 4. Local posts (v4 API)
-      gFetch(`https://mybusiness.googleapis.com/v4/${accountName}/${locationName}/localPosts?pageSize=10`),
-      // 5. Q&A (v4 API)
-      gFetch(`https://mybusiness.googleapis.com/v4/${accountName}/${locationName}/questions?pageSize=10`)
-    ]);
-
-    // Extract data safely
-    const loc      = locationDetail.status === 'fulfilled' ? locationDetail.value : state.selectedLocation;
-    const reviews  = reviewsData.status === 'fulfilled' ? reviewsData.value : {};
-    const media    = mediaData.status === 'fulfilled' ? mediaData.value : {};
-    const posts    = postsData.status === 'fulfilled' ? postsData.value : {};
-    const qa       = qaData.status === 'fulfilled' ? qaData.value : {};
-
-    // ── COMPUTE REAL METRICS ────────────────────────────────────────────────
-    const metrics = computeMetrics(loc, reviews, media, posts, qa);
-    state.rawData = { loc, reviews, media, posts, qa, metrics };
-
-    clearInterval(st);
-    steps.forEach(s => document.getElementById(s).className = 'ok');
-
-    // ── AI ANALYSIS ─────────────────────────────────────────────────────────
-    const aiResult = await analyseWithClaude(metrics, loc);
-    state.auditResult = { ...aiResult, metrics, locationName: loc.title || 'Your Business' };
-
-    lc.classList.remove('show');
-    renderResults(state.auditResult);
-
-  } catch(e) {
-    clearInterval(st);
-    lc.classList.remove('show');
-    document.getElementById('step1Card').style.display = 'block';
-    document.getElementById('step2Card').style.display = 'block';
-    showErr('Audit failed: ' + e.message + '. Please try again.');
-    console.error(e);
-  }
-}
-
-// ─── COMPUTE REAL METRICS FROM API DATA ───────────────────────────────────────
-function computeMetrics(loc, reviews, media, posts, qa) {
-  // Profile completeness
-  const hasName        = !!(loc.title);
-  const hasAddress     = !!(loc.storefrontAddress?.addressLines?.length);
-  const hasPhone       = !!(loc.phoneNumbers?.primaryPhone);
-  const hasWebsite     = !!(loc.websiteUri);
-  const hasHours       = !!(loc.regularHours?.periods?.length);
-  const hasDescription = !!(loc.profile?.description && loc.profile.description.length > 20);
-  const primaryCat     = loc.categories?.primaryCategory;
-  const hasPrimaryCat  = !!(primaryCat?.displayName || primaryCat?.name);
-  const additionalCats = loc.categories?.additionalCategories || [];
-  const hasSecondCats  = additionalCats.length > 0;
-  const descLength     = loc.profile?.description?.length || 0;
-  const serviceItems   = loc.serviceItems || [];
-  const hasServices    = serviceItems.length > 0;
-  const attributes     = loc.attributes || [];
-  const hasAttributes  = attributes.length > 0;
-
-  // Reviews
-  const reviewList     = reviews.reviews || [];
-  const totalReviews   = reviews.totalReviewCount || reviewList.length || 0;
-  const avgRating      = reviews.averageRating ? parseFloat(reviews.averageRating) : 0;
-  const respondedCount = reviewList.filter(r => r.reviewReply).length;
-  const responseRate   = totalReviews > 0 ? Math.round((respondedCount / Math.min(reviewList.length, totalReviews)) * 100) : 0;
-  // Recency: reviews in last 90 days
-  const nowMs          = Date.now();
-  const recentReviews  = reviewList.filter(r => {
-    const d = r.updateTime || r.createTime;
-    return d && (nowMs - new Date(d).getTime()) < 90 * 24 * 60 * 60 * 1000;
-  }).length;
-
-  // Photos
-  const mediaList      = media.mediaItems || [];
-  const totalPhotos    = media.totalMediaItemCount || mediaList.length || 0;
-  const photoCats      = {};
-  mediaList.forEach(m => {
-    const cat = m.locationAssociation?.category || 'ADDITIONAL';
-    photoCats[cat] = (photoCats[cat] || 0) + 1;
-  });
-  const hasCover       = !!(photoCats['COVER'] || photoCats['EXTERIOR']);
-  const hasLogo        = !!(photoCats['PROFILE'] || photoCats['LOGO']);
-  const hasInterior    = !!(photoCats['INTERIOR']);
-  const hasTeam        = !!(photoCats['TEAM'] || photoCats['AT_WORK']);
-
-  // Posts
-  const postList       = posts.localPosts || [];
-  const totalPosts     = posts.totalPostCount || postList.length || 0;
-  const recentPosts    = postList.filter(p => {
-    const d = p.updateTime || p.createTime;
-    return d && (nowMs - new Date(d).getTime()) < 30 * 24 * 60 * 60 * 1000;
-  }).length;
-  const lastPostDaysAgo = postList[0]?.createTime
-    ? Math.round((nowMs - new Date(postList[0].createTime).getTime()) / (24*60*60*1000))
-    : 999;
-
-  // Q&A
-  const qaList         = qa.questions || [];
-  const totalQA        = qa.totalQuestionCount || qaList.length || 0;
-  const answeredQA     = qaList.filter(q => q.topAnswers?.length > 0).length;
-
-  return {
-    // Profile
-    hasName, hasAddress, hasPhone, hasWebsite, hasHours, hasDescription,
-    hasPrimaryCat, hasSecondCats, additionalCatsCount: additionalCats.length,
-    descLength, hasServices, serviceCount: serviceItems.length,
-    hasAttributes, attributeCount: attributes.length,
-    // Reviews
-    totalReviews, avgRating, responseRate, recentReviews,
-    // Photos
-    totalPhotos, photoCats, hasCover, hasLogo, hasInterior, hasTeam,
-    // Posts
-    totalPosts, recentPosts, lastPostDaysAgo,
-    // Q&A
-    totalQA, answeredQA,
-    // Website
-    hasWebsite,
-    // Raw
-    businessName: loc.title || 'Your Business',
-    city: loc.storefrontAddress?.locality || '',
-    primaryCatName: primaryCat?.displayName || primaryCat?.name || 'Not set',
-  };
-}
-
-// ─── SCORE CALCULATION ────────────────────────────────────────────────────────
-function calculateScores(m) {
-  const cats = {};
-
-  // 1. Profile Completeness (20pts)
-  let comp = 0;
-  if (m.hasName)        comp += 3;
-  if (m.hasAddress)     comp += 3;
-  if (m.hasPhone)       comp += 3;
-  if (m.hasWebsite)     comp += 2;
-  if (m.hasHours)       comp += 3;
-  if (m.hasDescription) comp += 2;
-  if (m.descLength > 200) comp += 1;
-  if (m.hasAttributes)  comp += 1;
-  if (m.hasPrimaryCat)  comp += 1;
-  if (m.hasSecondCats)  comp += 1;
-  cats.completeness = { score: Math.min(comp, 20), max: 20,
-    real: `${[m.hasName,m.hasAddress,m.hasPhone,m.hasWebsite,m.hasHours,m.hasDescription].filter(Boolean).length}/6 core fields` };
-
-  // 2. Reviews (20pts)
-  let rev = 0;
-  if (m.totalReviews >= 100)       rev += 5;
-  else if (m.totalReviews >= 50)   rev += 4;
-  else if (m.totalReviews >= 25)   rev += 3;
-  else if (m.totalReviews >= 10)   rev += 2;
-  else if (m.totalReviews >= 1)    rev += 1;
-  if (m.avgRating >= 4.5)          rev += 5;
-  else if (m.avgRating >= 4.0)     rev += 4;
-  else if (m.avgRating >= 3.5)     rev += 3;
-  else if (m.avgRating >= 3.0)     rev += 2;
-  else if (m.avgRating > 0)        rev += 1;
-  if (m.responseRate >= 90)        rev += 4;
-  else if (m.responseRate >= 70)   rev += 3;
-  else if (m.responseRate >= 40)   rev += 2;
-  else if (m.responseRate >= 10)   rev += 1;
-  if (m.recentReviews >= 5)        rev += 4;
-  else if (m.recentReviews >= 2)   rev += 3;
-  else if (m.recentReviews >= 1)   rev += 2;
-  else if (m.totalReviews > 0)     rev += 1;
-  if (m.recentReviews >= 10)       rev += 2;
-  cats.reviews = { score: Math.min(rev, 20), max: 20,
-    real: `${m.totalReviews} reviews · ${m.avgRating.toFixed(1)}★ · ${m.responseRate}% response rate` };
-
-  // 3. Photos (15pts)
-  let ph = 0;
-  if (m.totalPhotos >= 100)        ph += 5;
-  else if (m.totalPhotos >= 50)    ph += 4;
-  else if (m.totalPhotos >= 25)    ph += 3;
-  else if (m.totalPhotos >= 10)    ph += 2;
-  else if (m.totalPhotos >= 3)     ph += 1;
-  if (m.hasCover)                  ph += 3;
-  if (m.hasLogo)                   ph += 2;
-  if (m.hasInterior)               ph += 2;
-  if (m.hasTeam)                   ph += 2;
-  if (m.totalPhotos >= 25 && m.hasCover && m.hasLogo) ph += 1;
-  cats.photos = { score: Math.min(ph, 15), max: 15,
-    real: `${m.totalPhotos} photos · Cover: ${m.hasCover?'✓':'✗'} · Logo: ${m.hasLogo?'✓':'✗'}` };
-
-  // 4. Posts (10pts)
-  let po = 0;
-  if (m.recentPosts >= 4)          po += 5;
-  else if (m.recentPosts >= 2)     po += 4;
-  else if (m.recentPosts >= 1)     po += 3;
-  if (m.lastPostDaysAgo <= 7)      po += 3;
-  else if (m.lastPostDaysAgo <= 14) po += 2;
-  else if (m.lastPostDaysAgo <= 30) po += 1;
-  if (m.totalPosts >= 20)          po += 2;
-  else if (m.totalPosts >= 10)     po += 1;
-  cats.posts = { score: Math.min(po, 10), max: 10,
-    real: `${m.recentPosts} posts in last 30 days · Last post: ${m.lastPostDaysAgo >= 999 ? 'never' : m.lastPostDaysAgo + ' days ago'}` };
-
-  // 5. Categories (10pts)
-  let ca = 0;
-  if (m.hasPrimaryCat)             ca += 5;
-  if (m.hasSecondCats)             ca += 3;
-  if (m.additionalCatsCount >= 3)  ca += 2;
-  else if (m.additionalCatsCount >= 2) ca += 1;
-  cats.categories = { score: Math.min(ca, 10), max: 10,
-    real: `Primary: ${m.primaryCatName} · ${m.additionalCatsCount} secondary cats` };
-
-  // 6. Services (10pts)
-  let sv = 0;
-  if (m.serviceCount >= 10)        sv += 6;
-  else if (m.serviceCount >= 5)    sv += 5;
-  else if (m.serviceCount >= 3)    sv += 4;
-  else if (m.serviceCount >= 1)    sv += 2;
-  if (m.hasAttributes)             sv += 2;
-  if (m.attributeCount >= 5)       sv += 2;
-  cats.services = { score: Math.min(sv, 10), max: 10,
-    real: `${m.serviceCount} service listings · ${m.attributeCount} attributes set` };
-
-  // 7. Q&A (5pts)
-  let q = 0;
-  if (m.totalQA >= 5)              q += 3;
-  else if (m.totalQA >= 3)         q += 2;
-  else if (m.totalQA >= 1)         q += 1;
-  if (m.answeredQA >= m.totalQA && m.totalQA > 0) q += 2;
-  else if (m.answeredQA > 0)       q += 1;
-  cats.qa = { score: Math.min(q, 5), max: 5,
-    real: `${m.totalQA} questions · ${m.answeredQA} answered` };
-
-  // 8. Website & AI Signals (10pts)
-  let ws = 0;
-  if (m.hasWebsite)                ws += 6;
-  if (m.hasWebsite)                ws += 2; // bonus for being linked (schema check done client-side)
-  if (m.hasDescription && m.descLength > 300) ws += 2;
-  cats.schema = { score: Math.min(ws, 10), max: 10,
-    real: `Website: ${m.hasWebsite ? 'linked ✓' : 'missing ✗'} · Description: ${m.descLength} chars` };
-
-  const overall = Object.values(cats).reduce((s, c) => s + c.score, 0);
-  const grade = overall >= 75 ? 'Good' : overall >= 45 ? 'Fair' : 'Poor';
-
-  return { cats, overall, grade };
-}
-
-// ─── CLAUDE ANALYSIS ──────────────────────────────────────────────────────────
-async function analyseWithClaude(metrics, loc) {
-  const scores = calculateScores(metrics);
-
-  const prompt = `You are an expert Google Business Profile (GMB) auditor. I have fetched REAL data from the Google Business Profile API for "${metrics.businessName}${metrics.city ? ' in ' + metrics.city : ''}".
-
-Here is the actual data pulled from the API:
-- Total Reviews: ${metrics.totalReviews}
-- Average Star Rating: ${metrics.avgRating.toFixed(1)}/5
-- Review Response Rate: ${metrics.responseRate}%
-- Reviews in last 90 days: ${metrics.recentReviews}
-- Total Photos: ${metrics.totalPhotos}
-- Has Cover Photo: ${metrics.hasCover}
-- Has Logo: ${metrics.hasLogo}
-- Posts in last 30 days: ${metrics.recentPosts}
-- Last post was: ${metrics.lastPostDaysAgo >= 999 ? 'never' : metrics.lastPostDaysAgo + ' days ago'}
-- Service listings: ${metrics.serviceCount}
-- Q&A questions: ${metrics.totalQA} (${metrics.answeredQA} answered)
-- Has Website: ${metrics.hasWebsite}
-- Primary Category: ${metrics.primaryCatName}
-- Additional Categories: ${metrics.additionalCatsCount}
-- Description length: ${metrics.descLength} characters
-- Attributes set: ${metrics.attributeCount}
-
-Calculated scores:
-- Overall: ${scores.overall}/100 (${scores.grade})
-- Completeness: ${scores.cats.completeness.score}/20
-- Reviews: ${scores.cats.reviews.score}/20
-- Photos: ${scores.cats.photos.score}/15
-- Posts: ${scores.cats.posts.score}/10
-- Categories: ${scores.cats.categories.score}/10
-- Services: ${scores.cats.services.score}/10
-- Q&A: ${scores.cats.qa.score}/5
-- Website/AI: ${scores.cats.schema.score}/10
-
-Based on this REAL data, respond with ONLY a JSON object (no markdown, no explanation):
-{
-  "verdict": "2-3 sentence verdict referencing the real numbers above — be specific",
-  "categoryFindings": {
-    "completeness": "1-2 sentence finding referencing actual missing/present fields",
-    "reviews": "1-2 sentence finding referencing the real ${metrics.totalReviews} reviews, ${metrics.avgRating.toFixed(1)} stars, ${metrics.responseRate}% response rate",
-    "photos": "1-2 sentence finding referencing the real ${metrics.totalPhotos} photos",
-    "posts": "1-2 sentence finding referencing the real post frequency data",
-    "categories": "1-2 sentence finding about category strategy",
-    "services": "1-2 sentence finding about service listings",
-    "qa": "1-2 sentence finding about Q&A",
-    "schema": "1-2 sentence finding about website and AI signals"
-  },
-  "topFixes": [
-    {"title": "short actionable title", "description": "2 sentences referencing real numbers", "impact": "High Impact|Medium Impact|Quick Win"}
-  ],
-  "competitorContext": "1 sentence about what competitors in this market typically do better"
-}
-
-Return exactly 5 topFixes. Reference the real numbers in your findings. Do not return markdown.`;
-
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': CONFIG.ANTHROPIC_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1200,
-      messages: [{ role: 'user', content: prompt }]
-    })
-  });
-
-  if (!r.ok) {
-    const e = await r.json().catch(()=>({}));
-    throw new Error('Claude API: ' + (e.error?.message || r.status));
-  }
-
-  const d = await r.json();
-  const text = d.content?.[0]?.text || '';
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error('Could not parse AI analysis response.');
-
-  const ai = JSON.parse(match[0]);
-  return { ...ai, scores };
-}
-
-// ─── RENDER RESULTS ────────────────────────────────────────────────────────────
-const CATS_DEF = [
-  { key:'completeness', icon:'📋', label:'Profile Completeness' },
-  { key:'reviews',      icon:'⭐', label:'Reviews & Reputation' },
-  { key:'photos',       icon:'📷', label:'Photos & Visuals' },
-  { key:'posts',        icon:'📢', label:'Google Posts' },
-  { key:'categories',   icon:'🏷️', label:'Category Strategy' },
-  { key:'services',     icon:'⚙️', label:'Services & Products' },
-  { key:'schema',       icon:'🤖', label:'Website & AI Signals' },
-  { key:'qa',           icon:'💬', label:'Q&A Section' },
+// ═══════════════════════════════════════════════════════════════
+// RENDER FREE RESULTS
+// ═══════════════════════════════════════════════════════════════
+const CATS=[
+  {k:'completeness',icon:'📋',lbl:'Profile Completeness'},
+  {k:'reviews',icon:'⭐',lbl:'Reviews & Reputation'},
+  {k:'photos',icon:'📷',lbl:'Photos & Visuals'},
+  {k:'posts',icon:'📢',lbl:'Google Posts'},
+  {k:'categories',icon:'🏷️',lbl:'Category Strategy'},
+  {k:'services',icon:'⚙️',lbl:'Services & Products'},
+  {k:'schema',icon:'🤖',lbl:'Website & AI Signals'},
+  {k:'qa',icon:'💬',lbl:'Q&A Section'},
 ];
 
-function renderResults(data) {
-  const { scores, verdict, categoryFindings, topFixes, locationName, metrics } = data;
-  const { overall, grade, cats } = scores;
+function renderFree() {
+  const {overall,grade,cats}=ST.scores;
+  const ai=ST.ai||{};
+  const m=window._metrics;
+  document.getElementById('res').classList.add('show');
 
-  document.getElementById('results').classList.add('show');
-
-  // Score dial
-  const circ = 408;
-  const offset = circ - (overall / 100) * circ;
-  const fill = document.getElementById('dialFill');
-  const col = overall >= 75 ? 'var(--green)' : overall >= 45 ? 'var(--amber)' : 'var(--red)';
-  fill.style.stroke = col;
-  setTimeout(() => {
-    fill.style.strokeDashoffset = offset;
-    animNum(document.getElementById('dialNum'), overall);
-  }, 200);
+  // Dial
+  const circ=376;
+  const df=document.getElementById('df');
+  const col=overall>=75?'var(--green)':overall>=45?'var(--amber)':'var(--red)';
+  df.style.stroke=col;
+  setTimeout(()=>{df.style.strokeDashoffset=circ-(overall/100)*circ;animN(document.getElementById('dnum'),overall);},200);
 
   // Score meta
-  document.getElementById('scoreBiz').textContent = locationName + (metrics.city ? ' · ' + metrics.city : '');
-  document.getElementById('scoreHead').textContent =
-    overall >= 75 ? 'Well optimised profile' : overall >= 45 ? 'Moderate optimisation needed' : 'Significant gaps found';
-  document.getElementById('scoreVerdict').textContent = verdict;
+  document.getElementById('sbiz').textContent=(m.bizName||'Your Business')+(m.city?' · '+m.city:'');
+  document.getElementById('shead').textContent=overall>=75?'Well optimised profile':overall>=45?'Moderate optimisation needed':'Significant gaps found';
+  document.getElementById('sverdict').textContent=ai.verdict||'Audit complete. Review your scores below.';
+  const gp=document.getElementById('sgp');
+  gp.className='gp '+(overall>=75?'g-g':overall>=45?'g-f':'g-p');
+  gp.textContent=({Good:'🟢 Good',Fair:'🟡 Fair',Poor:'🔴 Poor'}[grade]||grade)+' — '+overall+'/100';
 
-  const gradeEl = document.getElementById('gradeEl');
-  const gradeEmoji = { Poor:'🔴', Fair:'🟡', Good:'🟢' };
-  gradeEl.className = 'grade-pill ' + { Poor:'grade-poor', Fair:'grade-fair', Good:'grade-good' }[grade];
-  gradeEl.textContent = (gradeEmoji[grade] || '') + ' ' + grade + ' — ' + overall + '/100';
-
-  // Real data summary
-  const m = metrics;
-  const dg = document.getElementById('dataGrid');
-  const dItems = [
-    { val: m.totalReviews, label: 'Total Reviews', good: m.totalReviews>=50, warn: m.totalReviews>=10 },
-    { val: m.avgRating.toFixed(1)+'★', label: 'Avg Rating', good: m.avgRating>=4.5, warn: m.avgRating>=4.0 },
-    { val: m.responseRate+'%', label: 'Response Rate', good: m.responseRate>=80, warn: m.responseRate>=40 },
-    { val: m.totalPhotos, label: 'Total Photos', good: m.totalPhotos>=100, warn: m.totalPhotos>=25 },
-    { val: m.recentPosts, label: 'Posts (30d)', good: m.recentPosts>=4, warn: m.recentPosts>=1 },
-    { val: m.serviceCount, label: 'Service Listings', good: m.serviceCount>=10, warn: m.serviceCount>=3 },
+  // Real data strip
+  const dItems=[
+    {v:m.totR,l:'Reviews',g:m.totR>=50,w:m.totR>=10},
+    {v:m.avgR.toFixed(1)+'★',l:'Avg Rating',g:m.avgR>=4.5,w:m.avgR>=4.0},
+    {v:m.resp+'%',l:'Response Rate',g:m.resp>=80,w:m.resp>=40},
+    {v:m.totP,l:'Photos',g:m.totP>=100,w:m.totP>=25},
+    {v:m.recPo,l:'Posts (30d)',g:m.recPo>=4,w:m.recPo>=1},
+    {v:m.svcCount,l:'Services',g:m.svcCount>=10,w:m.svcCount>=3},
   ];
-  dg.innerHTML = dItems.map(d => `
-    <div class="ds-item">
-      <div class="ds-val ${d.good ? 'good' : d.warn ? 'warn' : 'bad'}">${d.val}</div>
-      <div class="ds-label">${d.label}</div>
-    </div>
-  `).join('');
+  document.getElementById('rdg').innerHTML=dItems.map(d=>`<div class="rdi"><div class="rdv ${d.g?'cg':d.w?'ca':'cr'}">${d.v}</div><div class="rdl">${d.l}</div></div>`).join('');
 
-  // Category cards
-  const cg = document.getElementById('catsGrid');
-  cg.innerHTML = '';
-  CATS_DEF.forEach((cd, i) => {
-    const c = cats[cd.key]; if (!c) return;
-    const pct = (c.score/c.max)*100;
-    const cl = pct>=75?'c-g':pct>=45?'c-a':'c-r';
-    const bc = pct>=75?'#00e676':pct>=45?'#ffb300':'#ff4757';
-    const el = document.createElement('div');
-    el.className = 'cat-card';
-    el.innerHTML = `
-      <div class="cc-top">
-        <div class="cc-name">${cd.icon} ${cd.label}</div>
-        <div class="cc-score ${cl}">${c.score}<span style="font-size:10px;color:var(--text-muted);font-weight:400">/${c.max}</span></div>
-      </div>
-      <div class="cc-bar"><div class="cc-fill" data-pct="${pct}" style="background:${bc}"></div></div>
-      <div class="cc-note">${categoryFindings?.[cd.key] || ''}</div>
-      <div class="cc-real">📊 ${c.real}</div>
-    `;
-    cg.appendChild(el);
-    setTimeout(() => {
-      el.classList.add('in');
-      el.querySelector('.cc-fill').style.width = pct + '%';
-    }, 300 + i * 90);
+  // Score bars
+  const barsEl=document.getElementById('bars');
+  barsEl.innerHTML='';
+  CATS.forEach((cd,i)=>{
+    const c=cats[cd.k];if(!c)return;
+    const pct=(c.s/c.m)*100;
+    const cl=pct>=75?'cg':pct>=45?'ca':'cr';
+    const bc=pct>=75?'bg':pct>=45?'ba':'br2';
+    const row=document.createElement('div');row.className='br';
+    row.innerHTML=`<div class="bl">${cd.icon} ${cd.lbl}</div><div class="bt"><div class="bf ${bc}" data-p="${pct}"></div></div><div class="bsc ${cl}">${c.s}<span style="font-size:10px;color:var(--muted)">/${c.m}</span></div>`;
+    barsEl.appendChild(row);
+    setTimeout(()=>{row.querySelector('.bf').style.width=pct+'%';},300+i*80);
   });
 
-  // Fixes
-  const fl = document.getElementById('fixList');
-  fl.innerHTML = '';
-  (topFixes||[]).forEach((f,i) => {
-    const el = document.createElement('div');
-    el.className = 'fix-row';
-    el.innerHTML = `
-      <div class="fix-n">${i+1}</div>
-      <div class="fix-body">
-        <h5>${f.title}</h5>
-        <p>${f.description}</p>
-        <div class="fix-impact">⚡ ${f.impact}</div>
-      </div>
-    `;
-    fl.appendChild(el);
-    setTimeout(() => el.classList.add('in'), 800 + i*100);
-  });
+  document.getElementById('res').scrollIntoView({behavior:'smooth',block:'start'});
 
-  document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+  // Auto-capture free lead in Odoo CRM (fire and forget)
+  captureOdooLead(ST.email||'', 'free', {scores:ST.scores}).catch(()=>{});
 }
 
-// ─── PDF GENERATION ────────────────────────────────────────────────────────────
-async function doDownload() {
-  const email = document.getElementById('pdfEmail').value.trim();
-  if (!email || !email.includes('@')) {
-    document.getElementById('pdfEmail').style.borderColor = 'var(--red)';
-    setTimeout(() => document.getElementById('pdfEmail').style.borderColor = '', 2000);
-    return;
+// ═══════════════════════════════════════════════════════════════
+// STRIPE PAYMENT
+// ═══════════════════════════════════════════════════════════════
+function goStripe(tier) {
+  // Save audit state to sessionStorage so we can restore after return
+  sessionStorage.setItem('pcTier',tier);
+  sessionStorage.setItem('pcAudit',JSON.stringify({scores:ST.scores,ai:ST.ai,metrics:window._metrics}));
+  // Add return URL with paid flag
+  const returnUrl=window.location.href.split('?')[0]+'?paid='+tier;
+  // Append return URL to Stripe link
+  const base=C.STRIPE[tier];
+  window.location.href=base+(base.includes('?')?'&':'?')+'prefilled_email='+encodeURIComponent(ST.email||'')+'&return_url='+encodeURIComponent(returnUrl);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CHECK PAYMENT RETURN
+// ═══════════════════════════════════════════════════════════════
+async function checkReturn() {
+  const params=new URLSearchParams(window.location.search);
+  const paid=params.get('paid');
+  if(!paid) return;
+  // Clean URL
+  history.replaceState(null,'',window.location.pathname);
+  // Restore saved audit if needed
+  const saved=sessionStorage.getItem('pcAudit');
+  if(saved&&(!ST.scores||!ST.ai)){
+    try{const d=JSON.parse(saved);ST.scores=d.scores;ST.ai=d.ai;window._metrics=d.metrics;}catch(e){}
   }
-  const btn = document.getElementById('pdfBtn');
-  btn.disabled = true; btn.innerHTML = '...';
-
-  // Log lead
-  try {
-    await fetch('https://api.anthropic.com/v1/messages', {
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':CONFIG.ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:30,messages:[{role:'user',content:`Lead: ${email} — ${state.auditResult?.locationName} — ${state.auditResult?.scores?.overall}/100. Reply: ok`}]})
-    });
-  } catch(e) {}
-
-  generatePDF(state.auditResult, state.rawData?.metrics, email);
-  btn.innerHTML = '✓ Downloaded';
-  document.getElementById('pdfOk').classList.add('show');
+  await unlockPaid(paid);
 }
 
-function generatePDF(data, m, email) {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ unit:'mm', format:'a4' });
-  const W=210, M=20, cx=W/2;
-  const S = data.scores;
+async function unlockPaid(tier) {
+  // Capture paid lead in Odoo CRM
+  captureOdooLead(ST.email||'', tier, {scores:ST.scores}).catch(()=>{});
 
-  // Cover page
-  doc.setFillColor(12,13,16); doc.rect(0,0,W,297,'F');
-  doc.setFillColor(0,230,118); doc.rect(0,0,W,3,'F');
-  doc.setTextColor(0,230,118); doc.setFontSize(8); doc.setFont('helvetica','bold');
-  doc.text('PURPLE CRIB STUDIOS · GMB AUDIT REPORT · REAL API DATA', M, 20);
+  // Show loading in paywall area
+  document.getElementById('pw').innerHTML='<div style="padding:32px;text-align:center"><div class="lr" style="margin:0 auto 16px"></div><div style="font-size:14px;color:var(--dim)">Generating your AI suggestions...</div></div>';
+  document.getElementById('blurwrap').style.display='none';
+  try {
+    const sgData=await claudeSuggestions(ST.scores,ST.raw||{});
+    renderPaid(sgData,tier);
+  } catch(e) {
+    document.getElementById('pw').innerHTML=`<div style="padding:24px;text-align:center;color:var(--red);font-size:13px">Could not generate suggestions: ${e.message}<br/><br/>Please WhatsApp us and we'll send them manually: <a href="https://wa.me/+2348180002345" style="color:var(--green)">+234 818 000 2345</a></div>`;
+  }
+}
 
-  // Score circle
-  doc.setFillColor(25,25,25); doc.circle(cx, 80, 30, 'F');
-  doc.setDrawColor(0,230,118); doc.setLineWidth(2.5); doc.circle(cx, 80, 30, 'S');
-  doc.setTextColor(255,255,255); doc.setFontSize(38); doc.setFont('helvetica','bold');
-  doc.text(String(S.overall), cx, 88, {align:'center'});
-  doc.setFontSize(9); doc.setTextColor(100,100,100);
-  doc.text('OUT OF 100', cx, 96, {align:'center'});
+// ═══════════════════════════════════════════════════════════════
+// RENDER PAID CONTENT
+// ═══════════════════════════════════════════════════════════════
+function renderPaid(sgData,tier) {
+  // Hide paywall, show paid
+  document.getElementById('pw').style.display='none';
+  document.getElementById('blurwrap').style.display='none';
+  document.getElementById('paid').className='paid on';
 
-  doc.setTextColor(255,255,255); doc.setFontSize(22); doc.setFont('helvetica','bold');
-  doc.text(data.locationName, cx, 122, {align:'center',maxWidth:160});
-  if (m?.city) { doc.setFontSize(10); doc.setTextColor(100,100,100); doc.setFont('helvetica','normal'); doc.text(m.city, cx, 131, {align:'center'}); }
-
-  const gc = S.grade==='Good'?[0,230,118]:S.grade==='Fair'?[255,179,0]:[255,71,87];
-  doc.setFillColor(...gc); doc.roundedRect(cx-28,138,56,10,5,5,'F');
-  doc.setTextColor(10,10,10); doc.setFontSize(9); doc.setFont('helvetica','bold');
-  doc.text(S.grade.toUpperCase()+' — '+S.overall+'/100', cx, 144.5, {align:'center'});
-
-  doc.setTextColor(140,140,140); doc.setFontSize(9); doc.setFont('helvetica','normal');
-  const vl = doc.splitTextToSize(data.verdict, 150);
-  doc.text(vl, cx, 160, {align:'center'});
-
-  // Real data summary on cover
-  doc.setFillColor(20,20,20); doc.roundedRect(M,190,W-2*M,50,4,4,'F');
-  doc.setTextColor(0,230,118); doc.setFontSize(8); doc.setFont('helvetica','bold');
-  doc.text('REAL DATA FROM GOOGLE API', cx, 200, {align:'center'});
-  const rData = m ? [
-    [`Reviews`, `${m.totalReviews}`],
-    [`Avg Rating`, `${m.avgRating.toFixed(1)}★`],
-    [`Response Rate`, `${m.responseRate}%`],
-    [`Photos`, `${m.totalPhotos}`],
-    [`Posts (30d)`, `${m.recentPosts}`],
-    [`Services`, `${m.serviceCount}`],
-  ] : [];
-  const cols = 3, cw = (W-2*M-20)/cols;
-  rData.forEach(([label, val], idx) => {
-    const col = idx % cols, row = Math.floor(idx / cols);
-    const x = M+10+(col*cw), y = 215+(row*16);
-    doc.setTextColor(255,255,255); doc.setFontSize(13); doc.setFont('helvetica','bold');
-    doc.text(val, x+cw/2, y, {align:'center'});
-    doc.setTextColor(100,100,100); doc.setFontSize(7); doc.setFont('helvetica','normal');
-    doc.text(label, x+cw/2, y+5, {align:'center'});
+  const wrap=document.getElementById('sgwrap');
+  wrap.innerHTML='';
+  (sgData.suggestions||[]).forEach((sg,i)=>{
+    const isHigh=sg.impact?.includes('High');
+    const card=document.createElement('div');
+    card.className='sg-card'+(isHigh?' hi':'');
+    const impClass=sg.impact?.includes('High')?'imp-h':sg.impact?.includes('Quick')?'imp-q':'imp-m';
+    card.innerHTML=`
+      <div class="sg-h">
+        <div class="sg-field">${sg.icon||'📌'} ${sg.field}</div>
+        <span class="imp ${impClass}">${sg.impact}</span>
+      </div>
+      <div class="sg-curr"><div class="sg-lbl">Current Situation</div><div class="sg-val">${sg.current}</div></div>
+      <div class="sg-rec">
+        <div class="sg-rec-lbl">✨ AI Suggestion — Ready to Paste</div>
+        <div class="sg-rec-v" id="sgv${i}">${sg.suggestion}</div>
+        <button class="cpbtn" onclick="copySg(${i},'${escQ(sg.suggestion)}')">Copy to clipboard</button>
+      </div>
+      ${sg.why?`<div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.5">💡 ${sg.why}</div>`:''}
+    `;
+    wrap.appendChild(card);
   });
 
-  doc.setFontSize(7); doc.setTextColor(60,60,60);
-  doc.text(`Generated: ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · For: ${email}`, M, 284);
-  doc.setTextColor(0,230,118); doc.text('purplecrib.ng', W-M, 284, {align:'right'});
+  // Month tier bonus: show strategy call booking
+  if(tier==='month'){
+    const bonus=document.createElement('div');
+    bonus.style.cssText='background:var(--gdim);border:1px solid var(--gmid);border-radius:13px;padding:20px;margin-bottom:11px;text-align:center';
+    bonus.innerHTML=`<div style="font-size:16px;margin-bottom:8px">🎯 Your Free 30-Min Strategy Call</div><p style="font-size:13px;color:var(--dim);margin-bottom:16px;line-height:1.6">As a Month supporter, you get a free 30-minute strategy call with Kayode to walk through your results and build your 90-day GMB plan.</p><a href="https://wa.me/+2348180002345?text=Hi, I just got my GMB audit report (Month tier) and I'd like to book my free strategy call for ${encodeURIComponent(window._metrics?.bizName||'my business')}" target="_blank" style="display:inline-block;padding:12px 28px;background:var(--green);color:#000;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px">Book Your Strategy Call →</a>`;
+    wrap.insertBefore(bonus,wrap.firstChild);
+  }
+}
 
-  // Page 2 – Category scores
+function escQ(s){return(s||'').replace(/'/g,"\\'")}
+function copySg(i,txt){
+  navigator.clipboard?.writeText(txt.replace(/\\'/g,"'")).then(()=>{
+    const b=document.querySelector(`.cpbtn[onclick*="copySg(${i},"]`);
+    if(b){b.textContent='✓ Copied!';b.className='cpbtn done';setTimeout(()=>{b.textContent='Copy to clipboard';b.className='cpbtn';},2500);}
+  }).catch(()=>{
+    const el=document.getElementById('sgv'+i);
+    if(el){const r=document.createRange();r.selectNode(el);window.getSelection().removeAllRanges();window.getSelection().addRange(r);}
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PDF GENERATION
+// ═══════════════════════════════════════════════════════════════
+function downloadPDF() {
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a4'});
+  const W=210,M=20,cx=W/2;
+  const sc=ST.scores,m=window._metrics||{};
+  const ai=ST.ai||{};
+
+  // Cover
+  doc.setFillColor(12,13,16);doc.rect(0,0,W,297,'F');
+  doc.setFillColor(0,230,118);doc.rect(0,0,W,3,'F');
+  doc.setTextColor(0,230,118);doc.setFontSize(8);doc.setFont('helvetica','bold');
+  doc.text('PURPLE CRIB STUDIOS · GMB AUDIT REPORT · REAL GOOGLE API DATA',M,20);
+
+  doc.setFillColor(22,22,22);doc.circle(cx,80,30,'F');
+  doc.setDrawColor(0,230,118);doc.setLineWidth(2.5);doc.circle(cx,80,30,'S');
+  doc.setTextColor(255,255,255);doc.setFontSize(38);doc.setFont('helvetica','bold');
+  doc.text(String(sc.overall),cx,88,{align:'center'});
+  doc.setFontSize(9);doc.setTextColor(100,100,100);
+  doc.text('OUT OF 100',cx,96,{align:'center'});
+
+  doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont('helvetica','bold');
+  doc.text(m.bizName||'Your Business',cx,118,{align:'center',maxWidth:160});
+  if(m.city){doc.setFontSize(10);doc.setTextColor(100,100,100);doc.setFont('helvetica','normal');doc.text(m.city,cx,127,{align:'center'});}
+
+  const gc=sc.grade==='Good'?[0,230,118]:sc.grade==='Fair'?[255,179,0]:[255,71,87];
+  doc.setFillColor(...gc);doc.roundedRect(cx-28,134,56,10,5,5,'F');
+  doc.setTextColor(10,10,10);doc.setFontSize(9);doc.setFont('helvetica','bold');
+  doc.text(sc.grade.toUpperCase()+' — '+sc.overall+'/100',cx,140.5,{align:'center'});
+
+  doc.setTextColor(140,140,140);doc.setFontSize(9);doc.setFont('helvetica','normal');
+  const vl=doc.splitTextToSize(ai.verdict||'See full breakdown on next pages.',150);
+  doc.text(vl,cx,155,{align:'center'});
+
+  // Real data summary box
+  doc.setFillColor(18,18,18);doc.roundedRect(M,178,W-2*M,54,4,4,'F');
+  doc.setTextColor(0,230,118);doc.setFontSize(8);doc.setFont('helvetica','bold');
+  doc.text('REAL DATA FROM GOOGLE API',cx,188,{align:'center'});
+  const rd=[[m.totR,'Reviews'],[m.avgR?.toFixed(1)+'★','Avg Rating'],[m.resp+'%','Response Rate'],[m.totP,'Photos'],[m.recPo,'Posts/30d'],[m.svcCount,'Services']];
+  const cw=(W-2*M-20)/3;
+  rd.forEach(([v,l],i)=>{
+    const col=i%3,row=Math.floor(i/3),x=M+10+(col*cw),y=200+(row*18);
+    doc.setTextColor(255,255,255);doc.setFontSize(13);doc.setFont('helvetica','bold');
+    doc.text(String(v||0),x+cw/2,y,{align:'center'});
+    doc.setTextColor(100,100,100);doc.setFontSize(7);doc.setFont('helvetica','normal');
+    doc.text(l,x+cw/2,y+5,{align:'center'});
+  });
+
+  doc.setFontSize(7);doc.setTextColor(60,60,60);
+  doc.text(`Generated: ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · purplecrib.ng`,cx,285,{align:'center'});
+
+  // Page 2 — Category breakdown
   doc.addPage();
-  doc.setFillColor(12,13,16); doc.rect(0,0,W,297,'F');
-  doc.setFillColor(0,230,118); doc.rect(0,0,W,3,'F');
-  doc.setTextColor(0,230,118); doc.setFontSize(8); doc.setFont('helvetica','bold');
-  doc.text('CATEGORY BREAKDOWN — REAL DATA', M, 18);
-  doc.setTextColor(255,255,255); doc.setFontSize(18); doc.text('Detailed Scores', M, 30);
+  doc.setFillColor(12,13,16);doc.rect(0,0,W,297,'F');
+  doc.setFillColor(0,230,118);doc.rect(0,0,W,3,'F');
+  doc.setTextColor(0,230,118);doc.setFontSize(8);doc.setFont('helvetica','bold');
+  doc.text('CATEGORY BREAKDOWN',M,18);
+  doc.setTextColor(255,255,255);doc.setFontSize(18);doc.text('Detailed Scores',M,30);
 
-  let y = 42;
-  CATS_DEF.forEach(cd => {
-    const c = S.cats[cd.key]; if(!c) return;
-    const pct = c.score/c.max;
-    doc.setTextColor(220,220,220); doc.setFontSize(11); doc.setFont('helvetica','bold');
-    doc.text(cd.label, M, y);
-    const sc = pct>=.75?[0,230,118]:pct>=.45?[255,179,0]:[255,71,87];
-    doc.setTextColor(...sc); doc.text(`${c.score}/${c.max}`, W-M, y, {align:'right'});
+  let y=42;
+  CATS.forEach(cd=>{
+    const c=sc.cats[cd.k];if(!c)return;
+    const pct=c.s/c.m;
+    doc.setTextColor(220,220,220);doc.setFontSize(11);doc.setFont('helvetica','bold');
+    doc.text(cd.lbl,M,y);
+    const sc2=pct>=.75?[0,230,118]:pct>=.45?[255,179,0]:[255,71,87];
+    doc.setTextColor(...sc2);doc.text(`${c.s}/${c.m}`,W-M,y,{align:'right'});
     y+=4;
-    doc.setFillColor(36,40,48); doc.roundedRect(M,y,W-2*M,3,1.5,1.5,'F');
-    doc.setFillColor(...sc); const bw=(W-2*M)*pct;
-    if(bw>0) doc.roundedRect(M,y,bw,3,1.5,1.5,'F');
+    doc.setFillColor(36,40,48);doc.roundedRect(M,y,W-2*M,3,1.5,1.5,'F');
+    doc.setFillColor(...sc2);if((W-2*M)*pct>0)doc.roundedRect(M,y,(W-2*M)*pct,3,1.5,1.5,'F');
     y+=6;
-    doc.setTextColor(0,180,90); doc.setFontSize(8); doc.setFont('helvetica','bold');
-    doc.text('📊 ' + (c.real||''), M, y);
+    doc.setTextColor(0,180,90);doc.setFontSize(8);doc.setFont('helvetica','bold');
+    doc.text('📊 '+c.real,M,y);
     y+=5;
-    doc.setTextColor(120,120,120); doc.setFontSize(9); doc.setFont('helvetica','normal');
-    const note = data.categoryFindings?.[cd.key] || '';
-    const nl = doc.splitTextToSize(note, W-2*M);
-    doc.text(nl, M, y); y+=nl.length*4+7;
-  });
-
-  // Page 3 – Action plan
-  doc.addPage();
-  doc.setFillColor(12,13,16); doc.rect(0,0,W,297,'F');
-  doc.setFillColor(0,230,118); doc.rect(0,0,W,3,'F');
-  doc.setTextColor(0,230,118); doc.setFontSize(8); doc.setFont('helvetica','bold');
-  doc.text('90-DAY ACTION PLAN', M, 18);
-  doc.setTextColor(255,255,255); doc.setFontSize(18); doc.text('Your Priority Fixes', M, 30);
-
-  y = 42;
-  (data.topFixes||[]).forEach((f,i) => {
-    doc.setFillColor(20,30,20); doc.roundedRect(M,y-4,8,8,2,2,'F');
-    doc.setTextColor(0,230,118); doc.setFontSize(9); doc.setFont('helvetica','bold');
-    doc.text(String(i+1),M+4,y+0.5,{align:'center'});
-    doc.setTextColor(220,220,220); doc.setFontSize(12); doc.setFont('helvetica','bold');
-    doc.text(f.title,M+12,y);
-    const ic=f.impact?.includes('High')?[255,80,80]:f.impact?.includes('Quick')?[0,230,118]:[255,179,0];
-    doc.setTextColor(...ic); doc.setFontSize(8);
-    doc.text('⚡ '+(f.impact||''),W-M,y,{align:'right'});
+    const note=ai.categoryFindings?.[cd.k]||'';
+    if(note){doc.setTextColor(120,120,120);doc.setFontSize(9);doc.setFont('helvetica','normal');const nl=doc.splitTextToSize(note,W-2*M);doc.text(nl,M,y);y+=nl.length*4;}
     y+=6;
-    doc.setTextColor(120,120,120); doc.setFontSize(10); doc.setFont('helvetica','normal');
-    const dl=doc.splitTextToSize(f.description,W-2*M-12);
-    doc.text(dl,M+12,y); y+=dl.length*5+8;
-    if(i<4){doc.setDrawColor(36,40,48);doc.setLineWidth(.2);doc.line(M,y,W-M,y);y+=6;}
   });
 
-  y=Math.max(y+14,246);
-  doc.setFillColor(20,30,20); doc.roundedRect(M,y,W-2*M,36,5,5,'F');
-  doc.setDrawColor(0,230,118); doc.setLineWidth(.5); doc.roundedRect(M,y,W-2*M,36,5,5,'S');
-  doc.setTextColor(255,255,255); doc.setFontSize(12); doc.setFont('helvetica','bold');
-  doc.text('Want us to fix all of this?',cx,y+11,{align:'center'});
-  doc.setTextColor(140,140,140); doc.setFontSize(9); doc.setFont('helvetica','normal');
-  doc.text('AI-powered GMB management from £297/month · Nigeria · UK · US',cx,y+20,{align:'center'});
-  doc.setTextColor(0,230,118); doc.setFontSize(10); doc.setFont('helvetica','bold');
-  doc.text('wa.me/+2348180002345  ·  purplecrib.ng',cx,y+30,{align:'center'});
+  // Page 3 — Action plan
+  doc.addPage();
+  doc.setFillColor(12,13,16);doc.rect(0,0,W,297,'F');
+  doc.setFillColor(0,230,118);doc.rect(0,0,W,3,'F');
+  doc.setTextColor(0,230,118);doc.setFontSize(8);doc.setFont('helvetica','bold');
+  doc.text('90-DAY ACTION PLAN',M,18);
+  doc.setTextColor(255,255,255);doc.setFontSize(18);doc.text('Priority Fixes',M,30);
 
-  const fn = `GMB-Audit-${(data.locationName||'Report').replace(/[^a-z0-9]/gi,'_')}-${new Date().toISOString().split('T')[0]}.pdf`;
+  y=42;
+  // Get suggestions from rendered cards if available
+  const sgCards=document.querySelectorAll('.sg-card');
+  if(sgCards.length){
+    sgCards.forEach((card,i)=>{
+      if(y>260){doc.addPage();doc.setFillColor(12,13,16);doc.rect(0,0,W,297,'F');y=20;}
+      const field=card.querySelector('.sg-field')?.textContent||`Fix ${i+1}`;
+      const curr=card.querySelector('.sg-val')?.textContent||'';
+      const rec=card.querySelector('.sg-rec-v')?.textContent||'';
+      const imp=card.querySelector('.imp')?.textContent||'';
+      doc.setFillColor(20,30,20);doc.roundedRect(M,y-4,8,8,2,2,'F');
+      doc.setTextColor(0,230,118);doc.setFontSize(9);doc.setFont('helvetica','bold');
+      doc.text(String(i+1),M+4,y+0.5,{align:'center'});
+      doc.setTextColor(220,220,220);doc.setFontSize(11);doc.setFont('helvetica','bold');
+      doc.text(field.trim(),M+12,y,{maxWidth:W-M-M-12});
+      const ic=imp.includes('High')?[255,80,80]:imp.includes('Quick')?[0,230,118]:[255,179,0];
+      doc.setTextColor(...ic);doc.setFontSize(8);doc.text('⚡ '+imp,W-M,y,{align:'right'});
+      y+=6;
+      if(curr){doc.setTextColor(100,100,100);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text('Current:',M+12,y);y+=5;
+        doc.setFont('helvetica','normal');const cl=doc.splitTextToSize(curr,W-M-M-12);doc.text(cl,M+12,y);y+=cl.length*4+3;}
+      if(rec){doc.setTextColor(0,200,80);doc.setFontSize(9);doc.setFont('helvetica','bold');doc.text('Suggestion:',M+12,y);y+=5;
+        doc.setFont('helvetica','normal');const rl=doc.splitTextToSize(rec.substring(0,200),W-M-M-12);doc.text(rl,M+12,y);y+=rl.length*4+8;}
+      doc.setDrawColor(36,40,48);doc.setLineWidth(.2);doc.line(M,y,W-M,y);y+=7;
+    });
+  } else {
+    // Fallback: just show category findings
+    Object.entries(sc.cats).sort(([,a],[,b])=>a.s/a.m-b.s/b.m).slice(0,6).forEach(([k,v],i)=>{
+      const def=CATS.find(c=>c.k===k);
+      doc.setTextColor(220,220,220);doc.setFontSize(11);doc.setFont('helvetica','bold');
+      doc.text(`${i+1}. Fix ${def?.lbl||k}`,M,y);
+      y+=6;
+      doc.setTextColor(120,120,120);doc.setFontSize(9);doc.setFont('helvetica','normal');
+      const f=doc.splitTextToSize(ai.categoryFindings?.[k]||'Improve this category.',W-2*M);
+      doc.text(f,M,y);y+=f.length*4+8;
+    });
+  }
+
+  // Footer CTA
+  const fy=Math.max(y+14,252);
+  doc.setFillColor(20,30,20);doc.roundedRect(M,fy,W-2*M,34,5,5,'F');
+  doc.setDrawColor(0,230,118);doc.setLineWidth(.5);doc.roundedRect(M,fy,W-2*M,34,5,5,'S');
+  doc.setTextColor(255,255,255);doc.setFontSize(12);doc.setFont('helvetica','bold');
+  doc.text('Want us to implement all of this for you?',cx,fy+11,{align:'center'});
+  doc.setTextColor(140,140,140);doc.setFontSize(9);doc.setFont('helvetica','normal');
+  doc.text('AI-powered GMB management from £297/month · Nigeria · UK · US',cx,fy+20,{align:'center'});
+  doc.setTextColor(0,230,118);doc.setFontSize(10);doc.setFont('helvetica','bold');
+  doc.text('wa.me/+2348180002345  ·  purplecrib.ng',cx,fy+29,{align:'center'});
+
+  const fn=`GMB-Audit-${(m.bizName||'Report').replace(/[^a-z0-9]/gi,'_')}-${new Date().toISOString().split('T')[0]}.pdf`;
   doc.save(fn);
 }
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
-async function gFetch(url) {
-  const r = await fetch(url, {
-    headers: { 'Authorization': 'Bearer ' + state.accessToken }
-  });
-  if (!r.ok) {
-    const e = await r.json().catch(()=>({}));
-    const msg = e.error?.message || e.error?.status || r.status;
-    throw new Error(`Google API error (${r.status}): ${msg}`);
-  }
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+async function gf(url) {
+  const r=await fetch(url,{headers:{'Authorization':'Bearer '+ST.token}});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(`Google API (${r.status}): ${e.error?.message||e.error?.status||r.status}`);}
   return r.json();
 }
-
-function animNum(el, target, dur=1500) {
+function animN(el,target,dur=1500){
   const s=performance.now();
-  const go=(now)=>{
-    const p=Math.min((now-s)/dur,1);
-    el.textContent=Math.round((1-Math.pow(1-p,3))*target);
-    if(p<1) requestAnimationFrame(go); else el.textContent=target;
-  };
+  const go=now=>{const p=Math.min((now-s)/dur,1);el.textContent=Math.round((1-Math.pow(1-p,3))*target);if(p<1)requestAnimationFrame(go);else el.textContent=target;};
   requestAnimationFrame(go);
 }
+function showErr(msg){const e=document.getElementById('err');if(!msg){e.classList.remove('show');return;}e.textContent=msg;e.classList.add('show');e.scrollIntoView({behavior:'smooth',block:'center'});}
 
-function showErr(msg) {
-  const el = document.getElementById('errBox');
-  if (!msg) { el.classList.remove('show'); return; }
-  el.textContent = msg; el.classList.add('show');
-  el.scrollIntoView({ behavior:'smooth', block:'center' });
-}
-
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  // GIS library loaded async — initialise when ready
-  if (window.google?.accounts?.oauth2) {
-    initGIS();
-  } else {
-    window.addEventListener('load', () => {
-      setTimeout(initGIS, 500);
-    });
-  }
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  if(window.google?.accounts?.oauth2)initGIS();
+  else window.addEventListener('load',()=>setTimeout(initGIS,500));
 });
 </script>
 </body>
